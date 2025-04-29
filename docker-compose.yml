@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_MULTIPLE_DATABASES: userauth,eventservice,bookingservice
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: notificationservice
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+
+  user-auth-service:
+    build: ./UserAuthService
+    container_name: user-auth-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/userauth
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SUPABASE_URL: ${SUPABASE_URL:-https://your-project-url.supabase.co}
+      SUPABASE_KEY: ${SUPABASE_KEY:-your-api-key}
+      SUPABASE_SECRET: ${SUPABASE_SECRET:-your-service-role-key}
+    restart: unless-stopped
+
+  event-service:
+    build: ./EventService
+    container_name: event-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/eventservice
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+    restart: unless-stopped
+
+  booking-service:
+    build: ./BookingService
+    container_name: booking-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bookingservice
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+    restart: unless-stopped
+
+  notification-service:
+    build: ./NotificationService
+    container_name: notification-service
+    depends_on:
+      - mongodb
+      - rabbitmq
+    ports:
+      - "8092:8092"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:example@mongodb:27017/notificationservice
+      SPRING_RABBITMQ_HOST: rabbitmq
+    restart: unless-stopped
+
+  availability-service:
+    build: ./AvailabilityService
+    container_name: availability-service
+    ports:
+      - "8091:8091"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+    depends_on:
+      - user-auth-service
+      - event-service
+      - booking-service
+      - notification-service
+      - availability-service
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  mongodb-data:
+  rabbitmq-data:
+  elasticsearch-data:

@@ -1,0 +1,17 @@
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/Controllers/AuthController.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/Controllers/UserController.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/UserAuthServiceApplication.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/config/SupabaseConfig.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/models/ERole.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/models/Role.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/models/User.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/payload/request/LoginRequest.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/payload/request/SignupRequest.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/payload/response/JwtResponse.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/payload/response/MessageResponse.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/repositories/RoleRepository.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/repositories/UserRepository.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/security/WebSecurityConfig.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/security/services/SupabaseAuthService.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/security/services/UserDetailsImpl.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/security/services/UserDetailsServiceImpl.java

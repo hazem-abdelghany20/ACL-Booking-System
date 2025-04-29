@@ -1,0 +1,6 @@
+com/example/hotel/EventService/controllers/EventControllerTest.class
+com/example/hotel/EventService/config/TestConfig.class
+com/example/hotel/EventService/EventServiceApplicationTests.class
+com/example/hotel/EventService/services/EventServiceTest.class
+com/example/hotel/EventService/models/EventTest.class
+com/example/hotel/EventService/controllers/CategoryControllerTest.class
