@@ -58,8 +58,12 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> 
                         auth.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/test/**").permitAll()
-                                .anyRequest().authenticated()
+                            .requestMatchers("/api/supabase/**").permitAll()
+                            .requestMatchers("/api/oauth/**").permitAll()
+                            .requestMatchers("/api/test/**").permitAll()
+                            .requestMatchers("/google-login").permitAll()
+                            .requestMatchers("/static/**").permitAll()
+                            .anyRequest().authenticated()
                 );
         
         http.authenticationProvider(authenticationProvider());

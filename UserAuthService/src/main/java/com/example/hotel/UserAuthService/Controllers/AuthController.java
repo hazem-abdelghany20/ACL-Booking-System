@@ -28,10 +28,14 @@ import com.example.hotel.UserAuthService.payload.request.SignupRequest;
 import com.example.hotel.UserAuthService.payload.response.MessageResponse;
 import com.example.hotel.UserAuthService.repositories.RoleRepository;
 import com.example.hotel.UserAuthService.repositories.UserRepository;
-import com.example.hotel.UserAuthService.security.services.SupabaseAuthService;
 import com.example.hotel.UserAuthService.security.services.UserDetailsImpl;
-
-import io.supabase.data.auth.UserResponse;
+import com.example.hotel.UserAuthService.Services.SupabaseAuthService;
+import com.example.hotel.UserAuthService.payload.request.EmailAuthRequest;
+import com.example.hotel.UserAuthService.payload.request.OtpVerificationRequest;
+import com.example.hotel.UserAuthService.payload.request.PhoneAuthRequest;
+import com.example.hotel.UserAuthService.payload.response.AuthResponse;
+import reactor.core.publisher.Mono;
+import org.springframework.http.HttpStatus;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -55,16 +59,13 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
-            // Authenticate with Supabase
-            UserResponse userResponse = supabaseAuthService.signIn(loginRequest.getUsername(), loginRequest.getPassword());
-            
-            // Also authenticate locally
+            // Authenticate locally
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
-            // Return the Supabase authentication response
-            return ResponseEntity.ok(userResponse);
+            // Return basic success response
+            return ResponseEntity.ok(new MessageResponse("User signed in successfully!"));
         } catch (Exception e) {
             return ResponseEntity
                     .badRequest()
@@ -88,14 +89,15 @@ public class AuthController {
         }
 
         try {
-            // Register with Supabase
-            UserResponse userResponse = supabaseAuthService.signUp(
-                    signUpRequest.getEmail(), 
-                    signUpRequest.getPassword(), 
-                    signUpRequest.getUsername()
-            );
+            // Create new user's account with basic information
+            User user = new User(signUpRequest.getUsername(), 
+                                 signUpRequest.getEmail(),
+                                 encoder.encode(signUpRequest.getPassword()));
             
-            return ResponseEntity.ok(userResponse);
+            // Save user
+            userRepository.save(user);
+            
+            return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
         } catch (Exception e) {
             return ResponseEntity
                     .badRequest()
@@ -104,26 +106,49 @@ public class AuthController {
     }
     
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser(@RequestBody String accessToken) {
-        try {
-            supabaseAuthService.signOut(accessToken);
-            return ResponseEntity.ok(new MessageResponse("You've been signed out!"));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> logoutUser() {
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok(new MessageResponse("You've been signed out!"));
     }
     
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody String email) {
-        try {
-            supabaseAuthService.resetPassword(email);
-            return ResponseEntity.ok(new MessageResponse("Password reset link sent!"));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: " + e.getMessage()));
-        }
+        // Basic placeholder for password reset
+        return ResponseEntity.ok(new MessageResponse("Password reset functionality not implemented yet"));
+    }
+
+    @PostMapping("/signup/email")
+    public Mono<ResponseEntity<AuthResponse>> signUpWithEmail(@Valid @RequestBody EmailAuthRequest request) {
+        return supabaseAuthService.signUpWithEmail(request)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
+    
+    @PostMapping("/signin/email")
+    public Mono<ResponseEntity<AuthResponse>> signInWithEmail(@Valid @RequestBody EmailAuthRequest request) {
+        return supabaseAuthService.signInWithEmail(request)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+    
+    @PostMapping("/signup/phone")
+    public Mono<ResponseEntity<AuthResponse>> signUpWithPhone(@Valid @RequestBody PhoneAuthRequest request) {
+        return supabaseAuthService.signUpWithPhone(request)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
+    
+    @PostMapping("/signin/phone")
+    public Mono<ResponseEntity<Void>> signInWithPhone(@Valid @RequestBody PhoneAuthRequest request) {
+        return supabaseAuthService.signInWithPhone(request)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+    
+    @PostMapping("/verify-otp")
+    public Mono<ResponseEntity<AuthResponse>> verifyPhoneOtp(@Valid @RequestBody OtpVerificationRequest request) {
+        return supabaseAuthService.verifyPhoneOtp(request)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 } 
