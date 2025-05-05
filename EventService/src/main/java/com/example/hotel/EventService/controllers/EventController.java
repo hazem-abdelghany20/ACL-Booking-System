@@ -194,4 +194,14 @@ public class EventController {
         Event event = eventService.changeEventType(id, eventType);
         return ResponseEntity.ok(event);
     }
+    
+    @PostMapping("/{id}/signup")
+    public ResponseEntity<?> signUpUserToEvent(@PathVariable("id") Long eventId, @RequestParam Long userId) {
+        try {
+            Event updatedEvent = eventService.signUpUserToEvent(eventId, userId);
+            return ResponseEntity.ok(updatedEvent);
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
 } 

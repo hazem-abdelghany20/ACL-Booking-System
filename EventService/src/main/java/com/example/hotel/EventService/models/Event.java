@@ -58,6 +58,11 @@ public class Event {
     
     private String currency = "USD";
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "event_participants", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "participant_id")
+    private Set<Long> participantIds = new HashSet<>();
+
     public Event() {
     }
 
@@ -253,5 +258,13 @@ public class Event {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public Set<Long> getParticipantIds() {
+        return participantIds;
+    }
+
+    public void setParticipantIds(Set<Long> participantIds) {
+        this.participantIds = participantIds;
     }
 } 

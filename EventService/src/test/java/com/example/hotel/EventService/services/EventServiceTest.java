@@ -56,4 +56,48 @@ class EventServiceTest {
         // Verify
         assertEquals(mockEvents, result);
     }
+
+    @Test
+    void signUpUserToEvent_success() {
+        Event event = new Event();
+        event.setId(1L);
+        event.setCapacity(2);
+        event.setParticipantIds(new java.util.HashSet<>());
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenAnswer(i -> i.getArgument(0));
+
+        Event updated = eventService.signUpUserToEvent(1L, 100L);
+        assertEquals(1, updated.getParticipantIds().size());
+        assertEquals(true, updated.getParticipantIds().contains(100L));
+    }
+
+    @Test
+    void signUpUserToEvent_alreadySignedUp() {
+        Event event = new Event();
+        event.setId(1L);
+        event.setCapacity(2);
+        java.util.Set<Long> participants = new java.util.HashSet<>();
+        participants.add(100L);
+        event.setParticipantIds(participants);
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalStateException.class, () -> {
+            eventService.signUpUserToEvent(1L, 100L);
+        });
+    }
+
+    @Test
+    void signUpUserToEvent_eventFull() {
+        Event event = new Event();
+        event.setId(1L);
+        event.setCapacity(1);
+        java.util.Set<Long> participants = new java.util.HashSet<>();
+        participants.add(100L);
+        event.setParticipantIds(participants);
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalStateException.class, () -> {
+            eventService.signUpUserToEvent(1L, 101L);
+        });
+    }
 } 
