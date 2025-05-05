@@ -1,10 +1,9 @@
 package com.example.hotel.UserAuthService.config;
 
-import io.supabase.SupabaseClient;
-import io.supabase.SupabaseClientOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class SupabaseConfig {
@@ -19,11 +18,20 @@ public class SupabaseConfig {
     private String supabaseSecret;
 
     @Bean
-    public SupabaseClient supabaseClient() {
-        SupabaseClientOptions options = new SupabaseClientOptions.Builder()
-                .setServiceKey(supabaseSecret)
-                .build();
-        
-        return new SupabaseClient(supabaseUrl, supabaseKey, options);
+    public WebClient supabaseClient() {
+        return WebClient.builder()
+            .baseUrl(supabaseUrl)
+            .defaultHeader("apikey", supabaseKey)
+            .defaultHeader("Authorization", "Bearer " + supabaseKey)
+            .build();
+    }
+    
+    @Bean
+    public WebClient supabaseAdminClient() {
+        return WebClient.builder()
+            .baseUrl(supabaseUrl)
+            .defaultHeader("apikey", supabaseKey)
+            .defaultHeader("Authorization", "Bearer " + supabaseSecret)
+            .build();
     }
 } 
