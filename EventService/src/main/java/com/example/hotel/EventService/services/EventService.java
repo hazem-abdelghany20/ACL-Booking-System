@@ -170,4 +170,17 @@ public class EventService {
         Category category = getCategoryById(id);
         categoryRepository.delete(category);
     }
+    
+    @Transactional
+    public Event signUpUserToEvent(Long eventId, Long userId) {
+        Event event = getEventById(eventId);
+        if (event.getParticipantIds().contains(userId)) {
+            throw new IllegalStateException("User already signed up for this event.");
+        }
+        if (event.getParticipantIds().size() >= event.getCapacity()) {
+            throw new IllegalStateException("Event is full.");
+        }
+        event.getParticipantIds().add(userId);
+        return eventRepository.save(event);
+    }
 } 
