@@ -11,6 +11,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.hotel.EventService.clients.PaymentClient;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -26,6 +31,9 @@ public class EventService {
     
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private PaymentClient paymentClient;
     
     // Event CRUD Operations
     public List<Event> getAllEvents() {
@@ -183,4 +191,44 @@ public class EventService {
         event.getParticipantIds().add(userId);
         return eventRepository.save(event);
     }
+
+    @Transactional
+    public String processEventPayment(Long eventId, Long userId) {
+        // Check if event exists
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Event not found with id: " + eventId));
+
+        // Check for invalid price
+        if (event.getPrice() < 0) {
+            throw new IllegalStateException("Invalid event price: " + event.getPrice());
+        }
+
+        // Handle free event
+        if (event.getPrice() == 0) {
+            return "No payment required for free event";
+        }
+
+        // Process payment
+        try {
+            ResponseEntity<Map<String, Object>> response =
+                    paymentClient.processPayment(userId, event.getPrice());
+
+            Map<String, Object> responseBody = response.getBody();
+            if (responseBody == null || !(Boolean)responseBody.get("success")) {
+                return "Payment failed: Insufficient funds";
+            }
+
+            // Payment successful - get the remaining balance from the response
+            Double remainingBalance = (Double) responseBody.get("remainingBalance");
+
+            // Return success message with balance information
+            return "Payment processed successfully for event: " + event.getTitle() +
+                    ". Your new balance is: " + remainingBalance;
+
+        } catch (Exception e) {
+            throw new IllegalStateException("Error processing payment: " + e.getMessage());
+        }
+    }
+
+
 } 

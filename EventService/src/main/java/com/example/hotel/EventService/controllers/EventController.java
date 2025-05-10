@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import java.util.NoSuchElementException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -204,4 +206,36 @@ public class EventController {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
     }
+
+    @PostMapping("/{id}/payment")
+    public ResponseEntity<String> processEventPayment(
+            @PathVariable("id") Long eventId,
+            @RequestParam Long userId) {
+
+        try {
+            String result = eventService.processEventPayment(eventId, userId);
+
+            // Check if payment failed due to insufficient funds
+            if (result.startsWith("Payment failed")) {
+                return ResponseEntity.badRequest().body(result);
+            }
+
+            // Otherwise, payment was successful or not required
+            return ResponseEntity.ok(result);
+
+        } catch (NoSuchElementException e) {
+            // Handle not found exceptions (event not found)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        } catch (IllegalStateException e) {
+            // Handle specific business logic errors (invalid price, etc.)
+            return ResponseEntity.badRequest().body(e.getMessage());
+
+        } catch (Exception e) {
+            // Handle unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
 } 
