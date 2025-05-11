@@ -38,7 +38,7 @@ public class UserController {
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         return userRepository.findById(id)
                 .map(user -> {
