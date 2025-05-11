@@ -1,7 +1,9 @@
 package com.example.searchservice.services;
 
 
+import com.example.searchservice.factories.SearchStrategyFactory;
 import com.example.searchservice.models.EventDto;
+import com.example.searchservice.strategies.SearchStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -12,21 +14,21 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 @Service
 public class SearchService {
 
-    private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${event.service.url}")
     private String eventServiceUrl;
 
-    public SearchService() {
-        this.restTemplate = new RestTemplate();
+    private final SearchStrategyFactory strategyFactory;
+
+    public SearchService(SearchStrategyFactory strategyFactory) {
+        this.strategyFactory = strategyFactory;
     }
 
     public List<EventDto> search(String keyword, String location, LocalDate fromDate, LocalDate toDate) {
-
         String requestUrl = eventServiceUrl + "/api/events/public?page=0&size=100";
 
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
@@ -39,19 +41,17 @@ public class SearchService {
         List<?> eventsRaw = (List<?>) response.getBody().get("events");
         List<EventDto> events = mapRawToEvents(eventsRaw);
 
+        // Apply all strategies
+        for (SearchStrategy strategy : strategyFactory.getStrategies()) {
+            events = strategy.filter(events, keyword, location, fromDate, toDate);
+        }
+
         return events.stream()
-                .filter(event -> keyword == null ||
-                        event.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
-                        event.getDescription().toLowerCase().contains(keyword.toLowerCase()))
-                .filter(event -> location == null || event.getLocation().equalsIgnoreCase(location))
-                .filter(event -> fromDate == null || !event.getStartDateTime().toLocalDate().isBefore(fromDate))
-                .filter(event -> toDate == null || !event.getStartDateTime().toLocalDate().isAfter(toDate))
-                .sorted(Comparator.comparing(EventDto::getStartDateTime)) // Rank by date
+                .sorted(Comparator.comparing(EventDto::getStartDateTime))
                 .collect(Collectors.toList());
     }
 
     private List<EventDto> mapRawToEvents(List<?> rawEvents) {
-        // Simplified mapper for mock; replace with real mapping or use Jackson
         return rawEvents.stream()
                 .map(obj -> {
                     Map<String, Object> map = (Map<String, Object>) obj;
