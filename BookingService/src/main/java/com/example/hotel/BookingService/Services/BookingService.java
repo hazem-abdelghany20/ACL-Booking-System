@@ -1,17 +1,18 @@
 package com.example.hotel.BookingService.Services;
 
-import com.example.hotel.BookingService.Clients.AvailabilityClient;
+import com.example.hotel.BookingService.Clients.EventClient;
 import com.example.hotel.BookingService.rabbitmq.BookingProducer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class BookingService {
-    private final AvailabilityClient availability;
+    private final EventClient eventClient;
     private final BookingProducer producer;
 
     @Value("${Name}")
@@ -20,18 +21,19 @@ public class BookingService {
     @Value("${ID}")
     String id;
 
-    public BookingService(AvailabilityClient availability,
-                          BookingProducer producer) {
-        this.availability = availability;
-        this.producer     = producer;
+    public BookingService(EventClient eventClient,
+                         BookingProducer producer) {
+        this.eventClient = eventClient;
+        this.producer = producer;
     }
     
-    public String createBooking(String roomType, int nights) {
-        // Check availability via Feign client
-        boolean isAvailable = availability.check(roomType, nights);
+    public String createEventBooking(Long eventId, Long userId) {
+        // Check ticket availability via EventClient
+        Map<String, Object> availabilityResponse = eventClient.getAvailableTickets(eventId);
+        int availableTickets = (int) availabilityResponse.get("availableTickets");
         
-        if (!isAvailable) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No availability for the requested room type and nights");
+        if (availableTickets <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
         }
         
         // Generate a random booking ID using UUID
