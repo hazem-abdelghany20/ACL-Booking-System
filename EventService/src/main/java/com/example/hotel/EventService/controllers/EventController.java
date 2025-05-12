@@ -277,6 +277,15 @@ public class EventController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{id}/available-tickets")
+    public ResponseEntity<Void> adjustAvailableTickets(
+            @PathVariable("id") Long id,
+            @RequestParam("delta") int delta
+    ) {
+        eventService.adjustAvailableTickets(id, delta);
+        return ResponseEntity.ok().build();
+    }
+
     /**
      * Book tickets for an event
      */

@@ -284,4 +284,20 @@ public class EventService {
 //
 //        return availabilityInfo;
 //    }
+
+
+     // Increment or decrement remaining tickets for an event.
+    public void adjustAvailableTickets(Long eventId, int delta) {
+        Event ev = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + eventId));
+
+        int newAvailable = ev.getAvailableTickets() + delta;
+        if (newAvailable < 0) {
+            throw new IllegalStateException("Not enough tickets for delta " + delta);
+        }
+
+        ev.setAvailableTickets(newAvailable);
+        eventRepository.save(ev);
+    }
+
 } 

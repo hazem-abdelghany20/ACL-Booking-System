@@ -20,6 +20,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import org.springframework.data.domain.PageRequest;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class EventServiceTest {
 
     @Mock
@@ -30,11 +41,32 @@ class EventServiceTest {
     
     @InjectMocks
     private EventService eventService;
-    
+
+    private List<Event> testEvents;
+
+
     @BeforeEach
     void setUp() {
+
         MockitoAnnotations.openMocks(this);
-    }
+
+        Event e1 = new Event();
+        e1.setId(1L);
+        e1.setCapacity(100);
+        e1.setParticipantIds(new HashSet<>(Arrays.asList(1L,2L)));
+
+        Event e2 = new Event();
+        e2.setId(2L);
+        e2.setCapacity(50);
+        e2.setParticipantIds(new HashSet<>());
+
+        Event e3 = new Event();
+        e3.setId(3L);
+        e3.setCapacity(200);
+        e3.setParticipantIds(new HashSet<>(Arrays.asList(5L)));
+
+        testEvents = Arrays.asList(e1, e2, e3);
+        }
     
     @Test
     void simpleTest() {

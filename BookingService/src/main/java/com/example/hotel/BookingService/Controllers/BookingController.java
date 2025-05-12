@@ -1,4 +1,4 @@
-package com.example.hotel.BookingService.controllers;
+package com.example.hotel.BookingService.Controllers;
 
 import com.example.hotel.BookingService.Services.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +36,17 @@ public class BookingController {
             return ResponseEntity.badRequest().body(error);
         }
     }
+    @DeleteMapping("/{bookingId}")
+    public ResponseEntity<Void> cancel(@PathVariable String bookingId) {
+        bookingService.cancelBooking(bookingId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{bookingId}/refund")
+    public ResponseEntity<Void> refund(@PathVariable String bookingId) {
+        bookingService.refundBooking(bookingId);
+        return ResponseEntity.ok().build();
+    }
+
 }
 

@@ -16,7 +16,7 @@ class EventServiceApplicationTests {
     void contextLoads() {
         // Simple test to verify that the Spring context loads
     }
-    
+
     @Test
     void simpleTest() {
         // A simple test that always passes
@@ -24,4 +24,4 @@ class EventServiceApplicationTests {
         String actual = "hello";
         assertEquals(expected, actual, "Simple test to verify test setup");
     }
-} 
+}
