@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@FeignClient(name = "event-service", url = "http://localhost:8082")
+@FeignClient(name = "event-service", url = "http://localhost:8081")
 public interface EventClient {
     @GetMapping("/api/events/{id}")
     ResponseEntity<Map<String, Object>> getEvent(@PathVariable("id") Long id);

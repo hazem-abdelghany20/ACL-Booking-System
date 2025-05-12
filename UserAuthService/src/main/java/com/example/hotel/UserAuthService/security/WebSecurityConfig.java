@@ -63,10 +63,6 @@ public class WebSecurityConfig {
                             .requestMatchers("/api/test/**").permitAll()
                             .requestMatchers("/google-login").permitAll()
                             .requestMatchers("/static/**").permitAll()
-                                .requestMatchers("/api/payments/**").permitAll()
-                                .requestMatchers("/api/users").permitAll()
-                                .requestMatchers("/api/users/**").permitAll()
-
                             .anyRequest().authenticated()
                 );
         
