@@ -207,34 +207,54 @@ public class EventController {
         }
     }
 
-    @PostMapping("/{id}/payment")
-    public ResponseEntity<String> processEventPayment(
-            @PathVariable("id") Long eventId,
-            @RequestParam Long userId) {
-
+    @PostMapping("/{eventId}/participants/{userId}")
+    public ResponseEntity<?> addParticipantToEvent(@PathVariable Long eventId, @PathVariable Long userId) {
         try {
-            String result = eventService.processEventPayment(eventId, userId);
+            boolean success = eventService.addParticipantToEvent(eventId, userId);
 
-            // Check if payment failed due to insufficient funds
-            if (result.startsWith("Payment failed")) {
-                return ResponseEntity.badRequest().body(result);
-            }
-
-            // Otherwise, payment was successful or not required
-            return ResponseEntity.ok(result);
-
-        } catch (NoSuchElementException e) {
-            // Handle not found exceptions (event not found)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-
-        } catch (IllegalStateException e) {
-            // Handle specific business logic errors (invalid price, etc.)
-            return ResponseEntity.badRequest().body(e.getMessage());
-
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Participant added to event successfully");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // Handle unexpected errors
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred: " + e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/{eventId}/participants/{userId}")
+    public ResponseEntity<?> removeParticipantFromEvent(@PathVariable Long eventId, @PathVariable Long userId) {
+        try {
+            boolean success = eventService.removeParticipantFromEvent(eventId, userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Participant removed from event successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @GetMapping("/{eventId}/participants/{userId}")
+    public ResponseEntity<?> isUserRegisteredForEvent(@PathVariable Long eventId, @PathVariable Long userId) {
+        try {
+            boolean isRegistered = eventService.isUserRegisteredForEvent(eventId, userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("isRegistered", isRegistered);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 

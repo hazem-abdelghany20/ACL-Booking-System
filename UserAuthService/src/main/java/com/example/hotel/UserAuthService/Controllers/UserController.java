@@ -20,7 +20,7 @@ public class UserController {
     UserRepository userRepository;
     
     @GetMapping
-  @PreAuthorize("hasRole('ADMIN')")
+//  @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

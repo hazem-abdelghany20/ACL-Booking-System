@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.hotel.EventService.clients.PaymentClient;
 import org.springframework.http.ResponseEntity;
 import java.util.Map;
 import java.util.HashMap;
@@ -32,8 +31,7 @@ public class EventService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private PaymentClient paymentClient;
+
     
     // Event CRUD Operations
     public List<Event> getAllEvents() {
@@ -193,40 +191,47 @@ public class EventService {
     }
 
     @Transactional
-    public String processEventPayment(Long eventId, Long userId) {
-        // Check if event exists
+    public boolean addParticipantToEvent(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoSuchElementException("Event not found with id: " + eventId));
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
 
-        // Check for invalid price
-        if (event.getPrice() < 0) {
-            throw new IllegalStateException("Invalid event price: " + event.getPrice());
+
+        if (event.getParticipantIds().size() >= event.getCapacity()) {
+            throw new RuntimeException("Event is at full capacity");
         }
 
-        // Handle free event
-        if (event.getPrice() == 0) {
-            return "No payment required for free event";
+        event.getParticipantIds().add(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean removeParticipantFromEvent(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+
+        if (!event.getParticipantIds().contains(userId)) {
+            throw new RuntimeException("User is not a participant in this event");
         }
 
-        // Process payment
+
+        event.getParticipantIds().remove(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    public boolean isUserRegisteredForEvent(Long eventId, Long userId) {
         try {
-            ResponseEntity<Map<String, Object>> response =
-                    paymentClient.processPayment(userId, event.getPrice());
-
-            Map<String, Object> responseBody = response.getBody();
-            if (responseBody == null || !(Boolean)responseBody.get("success")) {
-                return "Payment failed: Insufficient funds";
-            }
-
-            // Payment successful - get the remaining balance from the response
-            Double remainingBalance = (Double) responseBody.get("remainingBalance");
-
-            // Return success message with balance information
-            return "Payment processed successfully for event: " + event.getTitle() +
-                    ". Your new balance is: " + remainingBalance;
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+            return event.getParticipantIds().contains(userId);
 
         } catch (Exception e) {
-            throw new IllegalStateException("Error processing payment: " + e.getMessage());
+            System.err.println("Error checking if user is registered for event: " + e.getMessage());
+            throw new RuntimeException("Error checking if user is registered for event: " + e.getMessage(), e);
         }
     }
 

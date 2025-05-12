@@ -1,5 +1,4 @@
 /Users/abdallahgomaa/IdeaProjects/ACL-Booking-System/EventService/src/main/java/com/example/hotel/EventService/EventServiceApplication.java
-/Users/abdallahgomaa/IdeaProjects/ACL-Booking-System/EventService/src/main/java/com/example/hotel/EventService/clients/PaymentClient.java
 /Users/abdallahgomaa/IdeaProjects/ACL-Booking-System/EventService/src/main/java/com/example/hotel/EventService/controllers/CategoryController.java
 /Users/abdallahgomaa/IdeaProjects/ACL-Booking-System/EventService/src/main/java/com/example/hotel/EventService/controllers/EventController.java
 /Users/abdallahgomaa/IdeaProjects/ACL-Booking-System/EventService/src/main/java/com/example/hotel/EventService/exceptions/ResourceNotFoundException.java

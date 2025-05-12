@@ -41,6 +41,11 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_events", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "event_id")
+    private Set<Long> eventIds = new HashSet<>();
+
     public User() {
     }
 
@@ -96,5 +101,20 @@ public class User {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public void addEvent(Long eventId) {
+        this.eventIds.add(eventId);
+    }
+
+    public void removeEvent(Long eventId) {
+        this.eventIds.remove(eventId);
+    }
+
+    public Set<Long> getEventIds() {
+        return eventIds;
+    }
+    public void setEventIds(Set<Long> eventIds) {
+        this.eventIds = eventIds;
     }
 } 
