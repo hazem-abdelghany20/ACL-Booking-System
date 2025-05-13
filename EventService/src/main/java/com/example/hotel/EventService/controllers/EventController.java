@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import java.util.NoSuchElementException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -250,16 +252,16 @@ public class EventController {
     public ResponseEntity<Map<String, Object>> getEventsWithAvailableTickets(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        
+
         Pageable pageable = PageRequest.of(page, size);
         Page<Event> pageEvents = eventService.getEventsWithAvailableTickets(pageable);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("events", pageEvents.getContent());
         response.put("currentPage", pageEvents.getNumber());
         response.put("totalItems", pageEvents.getTotalElements());
         response.put("totalPages", pageEvents.getTotalPages());
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -269,11 +271,11 @@ public class EventController {
     @GetMapping("/{id}/available-tickets")
     public ResponseEntity<Map<String, Object>> getAvailableTicketsCount(@PathVariable Long id) {
         int availableTickets = eventService.getAvailableTicketsCount(id);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("eventId", id);
         response.put("availableTickets", availableTickets);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -304,4 +306,56 @@ public class EventController {
         }
     }
 
-} 
+
+    @PostMapping("/{eventId}/participants/{userId}")
+    public ResponseEntity<?> addParticipantToEvent(@PathVariable Long eventId, @PathVariable Long userId) {
+        try {
+            boolean success = eventService.addParticipantToEvent(eventId, userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Participant added to event successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/{eventId}/participants/{userId}")
+    public ResponseEntity<?> removeParticipantFromEvent(@PathVariable Long eventId, @PathVariable Long userId) {
+        try {
+            boolean success = eventService.removeParticipantFromEvent(eventId, userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Participant removed from event successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @GetMapping("/{eventId}/participants/{userId}")
+    public ResponseEntity<?> isUserRegisteredForEvent(@PathVariable Long eventId, @PathVariable Long userId) {
+        try {
+            boolean isRegistered = eventService.isUserRegisteredForEvent(eventId, userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("isRegistered", isRegistered);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+}

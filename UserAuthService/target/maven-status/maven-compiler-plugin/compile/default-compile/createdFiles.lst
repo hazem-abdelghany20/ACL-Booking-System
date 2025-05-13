@@ -7,8 +7,11 @@ com\example\hotel\UserAuthService\repositories\RoleRepository.class
 com\example\hotel\UserAuthService\Controllers\OAuthController.class
 com\example\hotel\UserAuthService\payload\response\AuthResponse.class
 com\example\hotel\UserAuthService\repositories\UserRepository.class
+com\example\hotel\UserAuthService\Services\PaymentService.class
+com\example\hotel\UserAuthService\Controllers\UserEventController.class
 com\example\hotel\UserAuthService\security\services\UserDetailsServiceImpl.class
 com\example\hotel\UserAuthService\models\ERole.class
+com\example\hotel\UserAuthService\Controllers\PaymentController.class
 com\example\hotel\UserAuthService\Services\SupabaseAuthService.class
 com\example\hotel\UserAuthService\payload\request\PhoneAuthRequest.class
 com\example\hotel\UserAuthService\Controllers\WebController.class
@@ -19,6 +22,7 @@ com\example\hotel\UserAuthService\security\WebSecurityConfig.class
 com\example\hotel\UserAuthService\payload\request\SignupRequest.class
 com\example\hotel\UserAuthService\payload\request\LoginRequest.class
 com\example\hotel\UserAuthService\payload\response\MessageResponse.class
+com\example\hotel\UserAuthService\Services\UserEventService.class
 com\example\hotel\UserAuthService\payload\request\OtpVerificationRequest.class
 com\example\hotel\UserAuthService\models\User.class
 com\example\hotel\UserAuthService\models\Role.class

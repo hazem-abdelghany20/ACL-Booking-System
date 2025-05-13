@@ -11,6 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -185,6 +189,53 @@ public class EventService {
         event.getParticipantIds().add(userId);
         return eventRepository.save(event);
     }
+
+    @Transactional
+    public boolean addParticipantToEvent(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+
+        if (event.getParticipantIds().size() >= event.getCapacity()) {
+            throw new RuntimeException("Event is at full capacity");
+        }
+
+        event.getParticipantIds().add(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean removeParticipantFromEvent(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+
+        if (!event.getParticipantIds().contains(userId)) {
+            throw new RuntimeException("User is not a participant in this event");
+        }
+
+
+        event.getParticipantIds().remove(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    public boolean isUserRegisteredForEvent(Long eventId, Long userId) {
+        try {
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+            return event.getParticipantIds().contains(userId);
+
+        } catch (Exception e) {
+            System.err.println("Error checking if user is registered for event: " + e.getMessage());
+            throw new RuntimeException("Error checking if user is registered for event: " + e.getMessage(), e);
+        }
+    }
+
+
     /**
      * Get events a user is participating in
      */
@@ -224,9 +275,11 @@ public class EventService {
      * Get the number of available tickets for a specific event
      */
     public int getAvailableTicketsCount(Long eventId) {
-        Event event = getEventById(eventId);
-        return event.getCapacity() - event.getParticipantIds().size();
+        Event ev = getEventById(eventId);        // throws ResourceNotFoundException
+        return ev.getCapacity() - ev.getParticipantIds().size();
     }
+
+
 
     /**
      * Book tickets for an event
@@ -300,4 +353,4 @@ public class EventService {
         eventRepository.save(ev);
     }
 
-} 
+}

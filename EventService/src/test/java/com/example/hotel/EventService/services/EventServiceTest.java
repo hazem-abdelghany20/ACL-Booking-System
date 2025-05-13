@@ -1,5 +1,6 @@
 package com.example.hotel.EventService.services;
 
+import com.example.hotel.EventService.exceptions.ResourceNotFoundException;
 import com.example.hotel.EventService.models.Event;
 import com.example.hotel.EventService.repositories.CategoryRepository;
 import com.example.hotel.EventService.repositories.EventRepository;
@@ -12,9 +13,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +43,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 class EventServiceTest {
 
@@ -229,13 +245,11 @@ class EventServiceTest {
     // New test for getAvailableTicketsCount(Long eventId) - when event doesn't exist
     @Test
     void getAvailableTicketsCount_eventDoesNotExist() {
-        Long eventId = 999L; // Non-existent event
-
+        Long eventId = 999L;
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
-        // Assuming getEventById throws an exception when event is not found
-        when(eventService.getEventById(eventId)).thenThrow(new RuntimeException("Event not found"));
 
-        assertThrows(RuntimeException.class, () -> {
+        // expect your custom exception, not RuntimeException
+        assertThrows(ResourceNotFoundException.class, () -> {
             eventService.getAvailableTicketsCount(eventId);
         });
 

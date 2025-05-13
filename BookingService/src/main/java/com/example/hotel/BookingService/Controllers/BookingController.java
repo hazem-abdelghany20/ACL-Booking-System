@@ -1,7 +1,8 @@
 package com.example.hotel.BookingService.Controllers;
 
-import com.example.hotel.BookingService.Services.BookingService;
+import com.example.hotel.BookingService.Services.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,5 +49,46 @@ public class BookingController {
         return ResponseEntity.ok().build();
     }
 
+
+    @PostMapping("/events/payment")
+    public ResponseEntity<Map<String, Object>> processEventPayment(@RequestParam Long userId, @RequestParam Long eventId) {
+        try {
+            String result = bookingService.processEventPayment(userId, eventId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", result);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Error processing payment: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
+     * Process refund for an event
+     */
+    @PostMapping("/events/refund")
+    public ResponseEntity<Map<String, Object>> processEventRefund(@RequestParam Long userId, @RequestParam Long eventId) {
+        try {
+            String result = bookingService.processEventRefund(userId, eventId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", result);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Error processing refund: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
 }
 
