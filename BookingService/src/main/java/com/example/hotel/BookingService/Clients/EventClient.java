@@ -3,6 +3,8 @@ package com.example.hotel.BookingService.Clients;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Map;
 
@@ -27,4 +29,8 @@ public interface EventClient {
     ResponseEntity<?> isUserRegisteredForEvent(
             @PathVariable("eventId") Long eventId,
             @PathVariable("userId") Long userId);
+
+
+    @GetMapping("/api/events/{eventId}/available-tickets")
+    Map<String, Object> getAvailableTickets(@PathVariable Long eventId);
 }

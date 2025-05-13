@@ -29,4 +29,28 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     
     @Query("SELECT e FROM Event e WHERE LOWER(e.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%')) AND e.eventType = 'PUBLIC' AND e.isPublished = true")
     Page<Event> searchEvents(@Param("keyword") String keyword, Pageable pageable);
+
+    // Find events a user is participating in
+    @Query("SELECT e FROM Event e WHERE :userId MEMBER OF e.participantIds")
+    List<Event> findByParticipantId(@Param("userId") Long userId);
+
+    // Find events a user is participating in (pageable version)
+    @Query("SELECT e FROM Event e WHERE :userId MEMBER OF e.participantIds")
+    Page<Event> findByParticipantId(@Param("userId") Long userId, Pageable pageable);
+
+    // Find all events related to a user (either as organizer or participant)
+    @Query("SELECT e FROM Event e WHERE e.organizerId = :userId OR :userId MEMBER OF e.participantIds")
+    List<Event> findAllEventsByUserId(@Param("userId") Long userId);
+
+    // Find all events related to a user (pageable version)
+    @Query("SELECT e FROM Event e WHERE e.organizerId = :userId OR :userId MEMBER OF e.participantIds")
+    Page<Event> findAllEventsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    // Find events with available tickets
+    @Query("SELECT e FROM Event e WHERE SIZE(e.participantIds) < e.capacity AND e.eventType = 'PUBLIC' AND e.isPublished = true")
+    Page<Event> findEventsWithAvailableTickets(Pageable pageable);
+
+    @Query("SELECT e FROM Event e WHERE e.isPublished = true AND SIZE(e.participantIds) < e.capacity")
+    Page<Event> findAvailableEvents(Pageable pageable);
+
 } 

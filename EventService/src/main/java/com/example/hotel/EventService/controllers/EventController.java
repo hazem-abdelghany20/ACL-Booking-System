@@ -207,6 +207,97 @@ public class EventController {
         }
     }
 
+    // Get events a user is participating in
+    @GetMapping("/participant/{userId}")
+    public ResponseEntity<Map<String, Object>> getEventsByParticipant(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Event> pageEvents = eventService.getEventsByParticipant(userId, pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("events", pageEvents.getContent());
+        response.put("currentPage", pageEvents.getNumber());
+        response.put("totalItems", pageEvents.getTotalElements());
+        response.put("totalPages", pageEvents.getTotalPages());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Get all events related to a user (both as organizer and participant)
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Map<String, Object>> getAllUserEvents(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Event> pageEvents = eventService.getAllUserEvents(userId, pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("events", pageEvents.getContent());
+        response.put("currentPage", pageEvents.getNumber());
+        response.put("totalItems", pageEvents.getTotalElements());
+        response.put("totalPages", pageEvents.getTotalPages());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get events with available tickets
+     */
+    @GetMapping("/available")
+    public ResponseEntity<Map<String, Object>> getEventsWithAvailableTickets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Event> pageEvents = eventService.getEventsWithAvailableTickets(pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("events", pageEvents.getContent());
+        response.put("currentPage", pageEvents.getNumber());
+        response.put("totalItems", pageEvents.getTotalElements());
+        response.put("totalPages", pageEvents.getTotalPages());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get available tickets count for a specific event
+     */
+    @GetMapping("/{id}/available-tickets")
+    public ResponseEntity<Map<String, Object>> getAvailableTicketsCount(@PathVariable Long id) {
+        int availableTickets = eventService.getAvailableTicketsCount(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("eventId", id);
+        response.put("availableTickets", availableTickets);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Book tickets for an event
+     */
+    @PostMapping("/{id}/book")
+    public ResponseEntity<?> bookEventTickets(
+            @PathVariable Long id,
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "1") int numberOfTickets) {
+        try {
+            Map<String, Object> booking = eventService.bookEventTickets(id, userId, numberOfTickets);
+            return ResponseEntity.ok(booking);
+        } catch (IllegalStateException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+
     @PostMapping("/{eventId}/participants/{userId}")
     public ResponseEntity<?> addParticipantToEvent(@PathVariable Long eventId, @PathVariable Long userId) {
         try {
@@ -258,4 +349,4 @@ public class EventController {
         }
     }
 
-} 
+}

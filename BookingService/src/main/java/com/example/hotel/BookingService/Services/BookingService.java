@@ -1,7 +1,7 @@
 package com.example.hotel.BookingService.Services;
 
-import com.example.hotel.BookingService.Clients.AvailabilityClient;
 import com.example.hotel.BookingService.Clients.EventClient;
+import com.example.hotel.BookingService.Clients.AvailabilityClient;
 import com.example.hotel.BookingService.Clients.UserClient;
 import com.example.hotel.BookingService.rabbitmq.BookingProducer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,11 @@ import java.util.UUID;
 
 @Service
 public class BookingService {
+
     private final AvailabilityClient availability;
+    private final EventClient eventClient;
     private final BookingProducer producer;
     private final UserClient userClient;
-    private final EventClient eventClient;
 
 
 
@@ -29,6 +30,7 @@ public class BookingService {
 
     @Value("${ID}")
     String id;
+
 
     public BookingService(AvailabilityClient availability,
                           BookingProducer producer,
@@ -40,12 +42,13 @@ public class BookingService {
         this.eventClient = eventClient;
     }
     
-    public String createBooking(String roomType, int nights) {
-        // Check availability via Feign client
-        boolean isAvailable = availability.check(roomType, nights);
+    public String createEventBooking(Long eventId, Long userId) {
+        // Check ticket availability via EventClient
+        Map<String, Object> availabilityResponse = eventClient.getAvailableTickets(eventId);
+        int availableTickets = (int) availabilityResponse.get("availableTickets");
         
-        if (!isAvailable) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No availability for the requested room type and nights");
+        if (availableTickets <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
         }
         
         // Generate a random booking ID using UUID
