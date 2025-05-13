@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="NotificationService" />
+        <module name="EventService" />
         <module name="BookingService" />
         <module name="AvailabilityService" />
         <module name="UserAuthService" />
@@ -19,6 +20,7 @@
       <module name="ApiGateway" options="-parameters" />
       <module name="AvailabilityService" options="-parameters" />
       <module name="BookingService" options="-parameters" />
+      <module name="EventService" options="-parameters" />
       <module name="NotificationService" options="-parameters" />
       <module name="UserAuthService" options="-parameters" />
     </option>

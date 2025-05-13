@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/AvailabilityService/pom.xml" />
         <option value="$PROJECT_DIR$/NotificationService/pom.xml" />
         <option value="$PROJECT_DIR$/ApiGateway/pom.xml" />
+        <option value="$PROJECT_DIR$/EventService/pom.xml" />
       </list>
     </option>
   </component>
