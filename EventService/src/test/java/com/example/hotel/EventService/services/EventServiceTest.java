@@ -12,13 +12,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 class EventServiceTest {
 
@@ -30,7 +45,9 @@ class EventServiceTest {
     
     @InjectMocks
     private EventService eventService;
-    
+
+
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -308,4 +325,8 @@ class EventServiceTest {
         assertTrue(result.getContent().isEmpty());
         verify(eventRepository, times(1)).findEventsWithAvailableTickets(any(Pageable.class));
     }
-} 
+
+
+
+
+}

@@ -11,6 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -28,7 +32,9 @@ public class EventService {
     
     @Autowired
     private CategoryRepository categoryRepository;
-    
+
+
+
     // Event CRUD Operations
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
@@ -185,6 +191,53 @@ public class EventService {
         event.getParticipantIds().add(userId);
         return eventRepository.save(event);
     }
+
+    @Transactional
+    public boolean addParticipantToEvent(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+
+        if (event.getParticipantIds().size() >= event.getCapacity()) {
+            throw new RuntimeException("Event is at full capacity");
+        }
+
+        event.getParticipantIds().add(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean removeParticipantFromEvent(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+
+        if (!event.getParticipantIds().contains(userId)) {
+            throw new RuntimeException("User is not a participant in this event");
+        }
+
+
+        event.getParticipantIds().remove(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    public boolean isUserRegisteredForEvent(Long eventId, Long userId) {
+        try {
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+            return event.getParticipantIds().contains(userId);
+
+        } catch (Exception e) {
+            System.err.println("Error checking if user is registered for event: " + e.getMessage());
+            throw new RuntimeException("Error checking if user is registered for event: " + e.getMessage(), e);
+        }
+    }
+
+
     /**
      * Get events a user is participating in
      */
@@ -234,27 +287,27 @@ public class EventService {
     @Transactional
     public Map<String, Object> bookEventTickets(Long eventId, Long userId, int numberOfTickets) {
         Event event = getEventById(eventId);
-        
+
         // Check if event is published and public
         if (!event.isPublished() || event.getEventType() != EventType.PUBLIC) {
             throw new IllegalStateException("Event is not available for booking");
         }
-        
+
         // Check if user is already registered
         if (event.getParticipantIds().contains(userId)) {
             throw new IllegalStateException("User already has tickets for this event");
         }
-        
+
         // Check if enough tickets are available
         int availableTickets = event.getCapacity() - event.getParticipantIds().size();
         if (availableTickets < numberOfTickets) {
             throw new IllegalStateException("Not enough tickets available. Available: " + availableTickets);
         }
-        
+
         // Add user to participants
         event.getParticipantIds().add(userId);
         eventRepository.save(event);
-        
+
         // Prepare response
         Map<String, Object> response = new HashMap<>();
         response.put("eventId", eventId);
@@ -262,7 +315,7 @@ public class EventService {
         response.put("numberOfTickets", numberOfTickets);
         response.put("remainingTickets", availableTickets - numberOfTickets);
         response.put("status", "CONFIRMED");
-        
+
         return response;
     }
 //    public Page<Event> getAvailableEvents(Pageable pageable) {
@@ -284,4 +337,4 @@ public class EventService {
 //
 //        return availabilityInfo;
 //    }
-} 
+}
