@@ -183,4 +183,50 @@ public class SupabaseAuthService {
                 .doOnSuccess(response -> logger.info("Successfully got OAuth providers: {}", response))
                 .doOnError(error -> logger.error("Error getting OAuth providers: {}", error.getMessage()));
     }
+
+    /**
+     * Request a password reset for the given email.
+     * Supabase will send an email to the user with a reset link.
+     */
+    public Mono<Void> requestPasswordReset(String email) {
+        logger.info("Requesting password reset for email: {}", email);
+        Map<String, Object> body = new HashMap<>();
+        body.put("email", email);
+        // The Supabase endpoint for requesting a password reset is typically /auth/v1/recover
+        // This might need to be adjusted based on specific Supabase project settings or API version.
+        return supabaseAdminClient.post() // Using supabaseAdminClient if admin privileges are needed, or supabaseClient otherwise
+                .uri("/auth/v1/recover") 
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .doOnSuccess(response -> logger.info("Successfully requested password reset for email: {}", email))
+                .doOnError(error -> logger.error("Error requesting password reset for email {}: {}", email, error.getMessage()));
+    }
+
+    /**
+     * Update the user's password using a reset token.
+     * This is typically done after the user clicks the link in the password reset email
+     * and is redirected back to our application with a token in the URL.
+     * The actual token processing and redirect URL handling are not covered here
+     * as Supabase usually handles that, and the frontend would extract the token.
+     * This method assumes the token is available to be passed to Supabase.
+     */
+    public Mono<AuthResponse> updateUserPasswordWithToken(String accessToken, String newPassword) {
+        logger.info("Updating user password with access token");
+        Map<String, Object> body = new HashMap<>();
+        body.put("password", newPassword);
+
+        // The Supabase endpoint for updating a user's password with an access token (after they are logged in or have a valid session token)
+        // is /auth/v1/user. The user is identified by the JWT in the Authorization header.
+        return supabaseClient.put() // User-context client
+                .uri("/auth/v1/user")
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(AuthResponse.class) // Assuming AuthResponse contains user info
+                .doOnSuccess(response -> logger.info("Successfully updated user password"))
+                .doOnError(error -> logger.error("Error updating user password: {}", error.getMessage()));
+    }
 } 
