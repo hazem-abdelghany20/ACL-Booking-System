@@ -10,6 +10,7 @@
         <module name="BookingService" />
         <module name="AvailabilityService" />
         <module name="UserAuthService" />
+        <module name="SearchService" />
       </profile>
     </annotationProcessing>
   </component>
@@ -18,6 +19,7 @@
       <module name="AvailabilityService" options="-parameters" />
       <module name="BookingService" options="-parameters" />
       <module name="NotificationService" options="-parameters" />
+      <module name="SearchService" options="-parameters" />
       <module name="UserAuthService" options="-parameters" />
     </option>
   </component>
