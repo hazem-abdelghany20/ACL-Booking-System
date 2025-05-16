@@ -5,18 +5,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.hotel.BookingService.Clients.AvailabilityClient;
+import com.example.hotel.BookingService.rabbitmq.BookingProducer;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/bookings")
+@RequestMapping("/bookings")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+    @Autowired
+    private AvailabilityClient availabilityClient;
+    @Autowired
+    private BookingProducer bookingProducer;
 
+    @Value("${Name}") private String name;
+    @Value("${ID}")   private String id;
+
+    @PostMapping(params = {"roomType","nights"})
+    public ResponseEntity<String> bookRoom(
+            @RequestParam("roomType") String roomType,
+            @RequestParam("nights")   int nights) {
+                boolean ok = availabilityClient.check(roomType, nights);
+               if (!ok) {
+                        return ResponseEntity.badRequest().build();
+               }
+                String bookingId = UUID.randomUUID().toString();
+                bookingProducer.sendBooking(bookingId);
+                return ResponseEntity.ok(bookingId);
+            }
     @PostMapping("/events/{eventId}")
     public ResponseEntity<Map<String, Object>> createEventBooking(
             @PathVariable Long eventId,
