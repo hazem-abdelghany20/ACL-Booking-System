@@ -28,6 +28,17 @@ services:
       - mongodb-data:/data/db
     restart: unless-stopped
 
+  # Added Redis service for session caching
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -54,12 +65,31 @@ services:
       - elasticsearch-data:/usr/share/elasticsearch/data
     restart: unless-stopped
 
+  # Added API Gateway service
+  api-gateway:
+    build: ./ApiGateway
+    container_name: api-gateway
+    depends_on:
+      - redis
+      - user-auth-service
+      - event-service
+      - booking-service
+      - notification-service
+    ports:
+      - "8000:8000"
+    environment:
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-hotelBookingSystemSecretKey2025}
+    restart: unless-stopped
+
   user-auth-service:
     build: ./UserAuthService
     container_name: user-auth-service
     depends_on:
       - postgres
       - rabbitmq
+      - redis
     ports:
       - "8080:8080"
     environment:
@@ -67,6 +97,9 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_SESSION_STORE_TYPE: redis
       SUPABASE_URL: ${SUPABASE_URL:-https://your-project-url.supabase.co}
       SUPABASE_KEY: ${SUPABASE_KEY:-your-api-key}
       SUPABASE_SECRET: ${SUPABASE_SECRET:-your-service-role-key}
@@ -78,6 +111,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+      - redis
     ports:
       - "8081:8081"
     environment:
@@ -85,6 +119,9 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_SESSION_STORE_TYPE: redis
     restart: unless-stopped
 
   booking-service:
@@ -93,6 +130,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+      - redis
     ports:
       - "8090:8090"
     environment:
@@ -100,6 +138,9 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_SESSION_STORE_TYPE: redis
     restart: unless-stopped
 
   notification-service:
@@ -108,11 +149,15 @@ services:
     depends_on:
       - mongodb
       - rabbitmq
+      - redis
     ports:
       - "8092:8092"
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://root:example@mongodb:27017/notificationservice
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_SESSION_STORE_TYPE: redis
     restart: unless-stopped
 
 
@@ -142,6 +187,7 @@ services:
       - booking-service
       - notification-service
       - search-service
+      - api-gateway
     restart: unless-stopped
 
 volumes:
@@ -149,3 +195,4 @@ volumes:
   mongodb-data:
   rabbitmq-data:
   elasticsearch-data:
+  redis-data:
