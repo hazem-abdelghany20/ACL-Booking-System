@@ -1,6 +1,7 @@
 package com.example.hotel.UserAuthService.Controllers;
 
-import com.example.hotel.UserAuthService.Services.PaymentService;
+
+import com.example.hotel.UserAuthService.Services.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,23 +11,24 @@ import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/payments")
-public class PaymentController {
+@RequestMapping("/api/wallet")
+public class WalletController {
+
     @Autowired
-    private PaymentService paymentService;
+    private WalletService walletService;
 
     @PostMapping("/process")
     public ResponseEntity<Map<String, Object>> processPayment(
             @RequestParam Long userId,
             @RequestParam Double amount) {
 
-        boolean success = paymentService.processPayment(userId, amount);
+        boolean success = walletService.processPayment(userId, amount);
         Map<String, Object> response = new HashMap<>();
 
         response.put("success", success);
         if (success) {
             response.put("message", "Payment processed successfully");
-            response.put("remainingBalance", paymentService.getBalance(userId));
+            response.put("remainingBalance", walletService.getBalance(userId));
             return ResponseEntity.ok(response);
         } else {
             response.put("message", "Insufficient balance");
@@ -34,12 +36,12 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/add-funds")
-    public ResponseEntity<Map<String, Object>> addFunds(
+    @PostMapping("/deposit")
+    public ResponseEntity<Map<String, Object>> depositToWallet(
             @RequestParam Long userId,
             @RequestParam Double amount) {
 
-        Double newBalance = paymentService.addFunds(userId, amount);
+        Double newBalance = walletService.depositToWallet(userId, amount);
         Map<String, Object> response = new HashMap<>();
 
         response.put("success", true);
@@ -51,7 +53,7 @@ public class PaymentController {
 
     @GetMapping("/balance/{userId}")
     public ResponseEntity<Map<String, Object>> getBalance(@PathVariable Long userId) {
-        Double balance = paymentService.getBalance(userId);
+        Double balance = walletService.getBalance(userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("userId", userId);

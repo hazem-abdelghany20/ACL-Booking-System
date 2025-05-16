@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class PaymentService {
-
+public class WalletService {
     @Autowired
     private UserRepository userRepository;
 
@@ -28,7 +27,7 @@ public class PaymentService {
 
 
     @Transactional
-    public Double addFunds(Long userId, Double amount) {
+    public Double depositToWallet(Long userId, Double amount) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
