@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.example.hotel.EventService.EventServiceApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.10 s -- in com.example.hotel.EventService.EventServiceApplicationTests
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.28 s -- in com.example.hotel.EventService.EventServiceApplicationTests
