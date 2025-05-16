@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,94 +29,138 @@ public class WalletService {
     }
     
     /**
-     * Get a user's wallet
+     * Gets or creates a wallet for a user
      * @param userId User ID
-     * @param token Authentication token
-     * @return Wallet if found
+     * @return Wallet object
      */
-    public Mono<Wallet> getWallet(String userId, String token) {
+    public Mono<Wallet> getWallet(String userId) {
         logger.info("Getting wallet for user: {}", userId);
         
-        return supabaseClient.get()
-                .uri("/rest/v1/wallets?user_id=eq." + userId)
-                .header("Authorization", "Bearer " + token)
+        return supabaseClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/rest/v1/wallets")
+                        .queryParam("user_id", "eq." + userId)
+                        .queryParam("select", "*")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<Wallet>>() {})
-                .map(wallets -> {
-                    if (wallets != null && !wallets.isEmpty()) {
-                        logger.info("Found wallet for user: {}", userId);
-                        return wallets.get(0);
+                .flatMap(wallets -> {
+                    if (wallets == null || wallets.isEmpty()) {
+                        logger.info("No wallet found for user: {}. Creating one...", userId);
+                        return createWallet(userId);
                     } else {
-                        logger.info("No wallet found for user: {}, creating a new one", userId);
-                        return createWallet(userId, token).block();
+                        logger.info("Wallet found for user: {}", userId);
+                        return Mono.just(wallets.get(0));
                     }
                 })
-                .doOnError(error -> logger.error("Error getting wallet: {}", error.getMessage()));
+                .onErrorResume(error -> {
+                    logger.error("Error getting wallet: {}", error.getMessage());
+                    return createWallet(userId);
+                });
     }
     
     /**
-     * Create a new wallet for a user with initial balance of 0
+     * Creates a wallet for a user with initial balance
      * @param userId User ID
-     * @param token Authentication token
      * @return Created wallet
      */
-    private Mono<Wallet> createWallet(String userId, String token) {
+    private Mono<Wallet> createWallet(String userId) {
         logger.info("Creating wallet for user: {}", userId);
         
-        Wallet newWallet = new Wallet();
-        newWallet.setUserId(userId);
-        newWallet.setBalance(0.0);
+        Map<String, Object> walletData = new HashMap<>();
+        walletData.put("user_id", userId);
+        walletData.put("balance", 1000.00); // Initial balance
         
-        return supabaseClient.post()
+        return supabaseClient
+                .post()
                 .uri("/rest/v1/wallets")
-                .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(newWallet)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(walletData)
                 .retrieve()
                 .bodyToMono(Wallet.class)
-                .doOnSuccess(wallet -> logger.info("Created wallet for user: {}", userId))
-                .doOnError(error -> logger.error("Error creating wallet: {}", error.getMessage()));
+                .doOnSuccess(wallet -> logger.info("Wallet created successfully for user: {}", userId))
+                .onErrorResume(error -> {
+                    logger.error("Error creating wallet: {}", error.getMessage());
+                    // Return a default wallet in case of error
+                    Wallet defaultWallet = new Wallet();
+                    defaultWallet.setUserId(userId);
+                    defaultWallet.setBalance(1000.00);
+                    return Mono.just(defaultWallet);
+                });
     }
     
     /**
-     * Add funds to a user's wallet
+     * Add funds to a wallet
      * @param userId User ID
      * @param amount Amount to add
-     * @param token Authentication token
      * @return Updated wallet
      */
-    public Mono<Wallet> addFunds(String userId, Double amount, String token) {
+    public Mono<Wallet> addFunds(String userId, Double amount) {
         logger.info("Adding {} funds to wallet for user: {}", amount, userId);
         
-        return supabaseClient.post()
-                .uri("/rest/v1/rpc/add_funds")
-                .header("Authorization", "Bearer " + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("user_id", userId, "amount", amount))
-                .retrieve()
-                .bodyToMono(Wallet.class)
-                .doOnSuccess(wallet -> logger.info("Added funds to wallet for user: {}", userId))
-                .doOnError(error -> logger.error("Error adding funds to wallet: {}", error.getMessage()));
+        return getWallet(userId)
+                .flatMap(wallet -> {
+                    Double newBalance = wallet.getBalance() + amount;
+                    
+                    Map<String, Object> updateData = new HashMap<>();
+                    updateData.put("balance", newBalance);
+                    
+                    return supabaseClient
+                            .patch()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path("/rest/v1/wallets")
+                                    .queryParam("user_id", "eq." + userId)
+                                    .build())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .bodyValue(updateData)
+                            .retrieve()
+                            .bodyToMono(Void.class)
+                            .then(Mono.defer(() -> {
+                                wallet.setBalance(newBalance);
+                                return Mono.just(wallet);
+                            }));
+                });
     }
     
     /**
-     * Deduct funds from a user's wallet
+     * Deduct funds from a wallet
      * @param userId User ID
      * @param amount Amount to deduct
-     * @param token Authentication token
      * @return Updated wallet
      */
-    public Mono<Wallet> deductFunds(String userId, Double amount, String token) {
+    public Mono<Wallet> deductFunds(String userId, Double amount) {
         logger.info("Deducting {} funds from wallet for user: {}", amount, userId);
         
-        return supabaseClient.post()
-                .uri("/rest/v1/rpc/deduct_funds")
-                .header("Authorization", "Bearer " + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("user_id", userId, "amount", amount))
-                .retrieve()
-                .bodyToMono(Wallet.class)
-                .doOnSuccess(wallet -> logger.info("Deducted funds from wallet for user: {}", userId))
-                .doOnError(error -> logger.error("Error deducting funds from wallet: {}", error.getMessage()));
+        return getWallet(userId)
+                .flatMap(wallet -> {
+                    if (wallet.getBalance() < amount) {
+                        return Mono.error(new IllegalArgumentException("Insufficient funds"));
+                    }
+                    
+                    Double newBalance = wallet.getBalance() - amount;
+                    
+                    Map<String, Object> updateData = new HashMap<>();
+                    updateData.put("balance", newBalance);
+                    
+                    return supabaseClient
+                            .patch()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path("/rest/v1/wallets")
+                                    .queryParam("user_id", "eq." + userId)
+                                    .build())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .bodyValue(updateData)
+                            .retrieve()
+                            .bodyToMono(Void.class)
+                            .then(Mono.defer(() -> {
+                                wallet.setBalance(newBalance);
+                                return Mono.just(wallet);
+                            }));
+                });
     }
 } 

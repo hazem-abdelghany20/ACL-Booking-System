@@ -31,64 +31,93 @@ public class WalletController {
     }
     
     /**
-     * Get a user's wallet balance
+     * Get the balance of the user's wallet
+     * @param token Authorization token
+     * @return Wallet balance
      */
     @GetMapping("/balance")
-    public Mono<ResponseEntity<Wallet>> getWalletBalance(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = authService.getUserIdFromToken(token);
+    public Mono<ResponseEntity<Object>> getBalance(@RequestHeader("Authorization") String token) {
+        logger.info("Getting wallet balance");
+        
+        // Extract token value from "Bearer <token>"
+        String tokenValue = token.substring(7);
+        String userId = authService.getUserIdFromToken(tokenValue);
         
         if (userId == null) {
-            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+            return Mono.just(ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("User not found in session")));
         }
         
-        return walletService.getWallet(userId, token)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return walletService.getWallet(userId)
+                .map(wallet -> ResponseEntity.ok().body((Object)wallet))
+                .onErrorResume(error -> Mono.just(ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body((Object)new MessageResponse("Error getting wallet: " + error.getMessage()))));
     }
     
     /**
-     * Add funds to a user's wallet
+     * Add funds to the user's wallet
+     * @param request Wallet transaction request
+     * @param token Authorization token
+     * @return Updated wallet
      */
     @PostMapping("/add-funds")
-    public Mono<ResponseEntity<Wallet>> addFunds(
-            @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody WalletTransactionRequest request) {
+    public Mono<ResponseEntity<Object>> addFunds(
+            @Valid @RequestBody WalletTransactionRequest request,
+            @RequestHeader("Authorization") String token) {
+        logger.info("Adding funds to wallet: {}", request.getAmount());
         
-        String token = authHeader.replace("Bearer ", "");
-        String userId = authService.getUserIdFromToken(token);
+        // Extract token value from "Bearer <token>"
+        String tokenValue = token.substring(7);
+        String userId = authService.getUserIdFromToken(tokenValue);
         
         if (userId == null) {
-            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+            return Mono.just(ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("User not found in session")));
         }
         
-        return walletService.addFunds(userId, request.getAmount(), token)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+        return walletService.addFunds(userId, request.getAmount())
+                .map(wallet -> ResponseEntity.ok().body((Object)wallet))
+                .onErrorResume(error -> Mono.just(ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body((Object)new MessageResponse("Error adding funds: " + error.getMessage()))));
     }
     
     /**
-     * Deduct funds from a user's wallet
+     * Deduct funds from the user's wallet
+     * @param request Wallet transaction request
+     * @param token Authorization token
+     * @return Updated wallet
      */
     @PostMapping("/deduct-funds")
-    public Mono<ResponseEntity<Wallet>> deductFunds(
-            @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody WalletTransactionRequest request) {
+    public Mono<ResponseEntity<Object>> deductFunds(
+            @Valid @RequestBody WalletTransactionRequest request,
+            @RequestHeader("Authorization") String token) {
+        logger.info("Deducting funds from wallet: {}", request.getAmount());
         
-        String token = authHeader.replace("Bearer ", "");
-        String userId = authService.getUserIdFromToken(token);
+        // Extract token value from "Bearer <token>"
+        String tokenValue = token.substring(7);
+        String userId = authService.getUserIdFromToken(tokenValue);
         
         if (userId == null) {
-            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+            return Mono.just(ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("User not found in session")));
         }
         
-        return walletService.deductFunds(userId, request.getAmount(), token)
-                .map(ResponseEntity::ok)
+        return walletService.deductFunds(userId, request.getAmount())
+                .map(wallet -> ResponseEntity.ok().body((Object)wallet))
                 .onErrorResume(error -> {
-                    logger.error("Error deducting funds: {}", error.getMessage());
+                    if (error instanceof IllegalArgumentException) {
+                        return Mono.just(ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body((Object)new MessageResponse(error.getMessage())));
+                    }
                     return Mono.just(ResponseEntity
-                            .status(HttpStatus.BAD_REQUEST)
-                            .build());
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body((Object)new MessageResponse("Error deducting funds: " + error.getMessage())));
                 });
     }
 } 
