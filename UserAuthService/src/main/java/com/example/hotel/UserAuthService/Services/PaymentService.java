@@ -1,47 +1,46 @@
 package com.example.hotel.UserAuthService.Services;
 
-import com.example.hotel.UserAuthService.models.User;
-import com.example.hotel.UserAuthService.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * Placeholder payment service that uses in-memory storage instead of a database.
+ * This will be replaced with proper Supabase integration in the future.
+ */
 @Service
 public class PaymentService {
 
-    @Autowired
-    private UserRepository userRepository;
+    // Simple in-memory user balance map for testing
+    private static final Map<Long, Double> userBalances = new HashMap<>();
 
+    // Initialize with some test data
+    static {
+        userBalances.put(1L, 1000.0);
+        userBalances.put(2L, 500.0);
+    }
 
     @Transactional
     public boolean processPayment(Long userId, Double amount) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-
-        if (user.getBalance() >= amount) {
-            user.setBalance(user.getBalance() - amount);
-            userRepository.save(user);
+        Double balance = userBalances.getOrDefault(userId, 0.0);
+        
+        if (balance >= amount) {
+            userBalances.put(userId, balance - amount);
             return true;
         }
         return false;
     }
 
-
     @Transactional
     public Double addFunds(Long userId, Double amount) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-
-        user.setBalance(user.getBalance() + amount);
-        userRepository.save(user);
-        return user.getBalance();
+        Double balance = userBalances.getOrDefault(userId, 0.0);
+        Double newBalance = balance + amount;
+        userBalances.put(userId, newBalance);
+        return newBalance;
     }
 
-
     public Double getBalance(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-
-        return user.getBalance();
+        return userBalances.getOrDefault(userId, 0.0);
     }
 }

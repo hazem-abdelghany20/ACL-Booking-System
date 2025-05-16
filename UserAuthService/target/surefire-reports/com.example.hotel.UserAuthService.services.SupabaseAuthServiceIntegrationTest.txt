@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.example.hotel.UserAuthService.services.SupabaseAuthServiceIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 1.026 s -- in com.example.hotel.UserAuthService.services.SupabaseAuthServiceIntegrationTest

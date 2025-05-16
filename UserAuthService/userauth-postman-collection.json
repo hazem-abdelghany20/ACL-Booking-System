@@ -1,0 +1,256 @@
+{
+    "info": {
+      "name": "UserAuth Service API Tests",
+      "description": "Collection for testing UserAuth microservice endpoints including authentication, wallet operations, and OAuth functionalities",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Authentication",
+        "description": "Test endpoints related to user authentication",
+        "item": [
+          {
+            "name": "Sign Up with Email",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"email\": \"test1@example.com\",\n    \"password\": \"Password123!\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:8081/api/auth/signup",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "auth", "signup"]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Sign In with Email",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "var jsonData = pm.response.json();",
+                    "console.log('Response:', JSON.stringify(jsonData));",
+                    "",
+                    "// Extract and save the access token",
+                    "if (jsonData.access_token) {",
+                    "    pm.environment.set('access_token', jsonData.access_token);",
+                    "    console.log('Saved access_token from response');",
+                    "}",
+                    "",
+                    "// Save refresh token if available",
+                    "if (jsonData.refresh_token) {",
+                    "    pm.environment.set('refresh_token', jsonData.refresh_token);",
+                    "}",
+                    "",
+                    "// Save user ID from the user object",
+                    "if (jsonData.user && jsonData.user.id) {",
+                    "    pm.environment.set('user_id', jsonData.user.id);",
+                    "    console.log('Saved user_id: ' + jsonData.user.id);",
+                    "} else {",
+                    "    // Fallback user ID from test results",
+                    "    pm.environment.set('user_id', '09dde273-8a1b-49d5-8185-414a203af355');",
+                    "    console.log('Using fallback user_id');",
+                    "}"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"email\": \"test1@example.com\",\n    \"password\": \"Password123!\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:8081/api/auth/signin",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "auth", "signin"]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Reset Password",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{access_token}}"
+                }
+              ],
+              "url": {
+                "raw": "http://localhost:8081/api/auth/reset-password?email=test1@example.com",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "auth", "reset-password"],
+                "query": [
+                  {
+                    "key": "email",
+                    "value": "test1@example.com"
+                  }
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Logout",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{access_token}}"
+                }
+              ],
+              "url": {
+                "raw": "http://localhost:8081/api/auth/signout",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "auth", "signout"]
+              }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Wallet Operations",
+        "description": "Test endpoints related to wallet functionality",
+        "item": [
+          {
+            "name": "Get Wallet Balance",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{access_token}}"
+                }
+              ],
+              "url": {
+                "raw": "http://localhost:8081/api/wallet/{{user_id}}",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "wallet", "{{user_id}}"]
+              }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "OAuth",
+        "description": "Test endpoints related to OAuth authentication",
+        "item": [
+          {
+            "name": "Get Google OAuth URL",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "http://localhost:8081/api/oauth/google",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "oauth", "google"]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "OAuth Callback",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "var jsonData = pm.response.json();",
+                    "console.log('OAuth Callback Response:', JSON.stringify(jsonData));",
+                    "if (jsonData.access_token) {",
+                    "    pm.environment.set('access_token', jsonData.access_token);",
+                    "}",
+                    "if (jsonData.user && jsonData.user.id) {",
+                    "    pm.environment.set('user_id', jsonData.user.id);",
+                    "}"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ],
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "http://localhost:8081/api/oauth/callback?code=valid-oauth-code",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "oauth", "callback"],
+                "query": [
+                  {
+                    "key": "code",
+                    "value": "valid-oauth-code"
+                  }
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "User Operations",
+        "description": "Test endpoints related to user data",
+        "item": [
+          {
+            "name": "Get All Users",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "http://localhost:8081/api/users/all",
+                "protocol": "http",
+                "host": ["localhost"],
+                "port": "8081",
+                "path": ["api", "users", "all"]
+              }
+            },
+            "response": []
+          }
+        ]
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:8081"
+      }
+    ]
+  }

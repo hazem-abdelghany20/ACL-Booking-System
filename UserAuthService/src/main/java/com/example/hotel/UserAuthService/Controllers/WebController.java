@@ -10,4 +10,14 @@ public class WebController {
     public String googleLoginPage() {
         return "google-login";
     }
+    
+    @GetMapping("/auth-success")
+    public String authSuccessPage() {
+        return "auth-success";
+    }
+    
+    @GetMapping("/auth-error")
+    public String authErrorPage() {
+        return "auth-error";
+    }
 } 

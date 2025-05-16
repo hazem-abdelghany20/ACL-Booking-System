@@ -62,4 +62,15 @@ public class AuthResponse {
     public void setUser(Map<String, Object> user) {
         this.user = user;
     }
+    
+    /**
+     * Helper method to get the user ID
+     * @return The ID of the user from the user map
+     */
+    public String getUserId() {
+        if (user != null && user.containsKey("id")) {
+            return user.get("id").toString();
+        }
+        return null;
+    }
 } 
