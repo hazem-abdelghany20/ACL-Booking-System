@@ -115,12 +115,19 @@ services:
       SPRING_RABBITMQ_HOST: rabbitmq
     restart: unless-stopped
 
-  availability-service:
-    build: ./AvailabilityService
-    container_name: availability-service
+
+
+  search-service:
+    build: ./SearchService
+    container_name: search-service
+    depends_on:
+      - event-service
     ports:
-      - "8091:8091"
+      - "8093:8093"
+    environment:
+      EVENT_SERVICE_BASE_URL: http://event-service:8081
     restart: unless-stopped
+
 
   nginx:
     image: nginx:latest
@@ -134,7 +141,7 @@ services:
       - event-service
       - booking-service
       - notification-service
-      - availability-service
+      - search-service
     restart: unless-stopped
 
 volumes:

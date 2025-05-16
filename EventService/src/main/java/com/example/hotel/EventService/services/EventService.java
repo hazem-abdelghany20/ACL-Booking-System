@@ -11,10 +11,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -170,4 +176,181 @@ public class EventService {
         Category category = getCategoryById(id);
         categoryRepository.delete(category);
     }
-} 
+    
+    @Transactional
+    public Event signUpUserToEvent(Long eventId, Long userId) {
+        Event event = getEventById(eventId);
+        if (event.getParticipantIds().contains(userId)) {
+            throw new IllegalStateException("User already signed up for this event.");
+        }
+        if (event.getParticipantIds().size() >= event.getCapacity()) {
+            throw new IllegalStateException("Event is full.");
+        }
+        event.getParticipantIds().add(userId);
+        return eventRepository.save(event);
+    }
+
+    @Transactional
+    public boolean addParticipantToEvent(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+
+        if (event.getParticipantIds().size() >= event.getCapacity()) {
+            throw new RuntimeException("Event is at full capacity");
+        }
+
+        event.getParticipantIds().add(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean removeParticipantFromEvent(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+
+        if (!event.getParticipantIds().contains(userId)) {
+            throw new RuntimeException("User is not a participant in this event");
+        }
+
+
+        event.getParticipantIds().remove(userId);
+        eventRepository.save(event);
+
+        return true;
+    }
+
+    public boolean isUserRegisteredForEvent(Long eventId, Long userId) {
+        try {
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+            return event.getParticipantIds().contains(userId);
+
+        } catch (Exception e) {
+            System.err.println("Error checking if user is registered for event: " + e.getMessage());
+            throw new RuntimeException("Error checking if user is registered for event: " + e.getMessage(), e);
+        }
+    }
+
+
+    /**
+     * Get events a user is participating in
+     */
+    public List<Event> getEventsByParticipant(Long userId) {
+        return eventRepository.findByParticipantId(userId);
+    }
+
+    /**
+     * Get events a user is participating in (with pagination)
+     */
+    public Page<Event> getEventsByParticipant(Long userId, Pageable pageable) {
+        return eventRepository.findByParticipantId(userId, pageable);
+    }
+
+    /**
+     * Get all events related to a user (both as organizer and participant)
+     */
+    public List<Event> getAllUserEvents(Long userId) {
+        return eventRepository.findAllEventsByUserId(userId);
+    }
+
+    /**
+     * Get all events related to a user (with pagination)
+     */
+    public Page<Event> getAllUserEvents(Long userId, Pageable pageable) {
+        return eventRepository.findAllEventsByUserId(userId, pageable);
+    }
+
+    /**
+     * Get events that have available tickets
+     */
+    public Page<Event> getEventsWithAvailableTickets(Pageable pageable) {
+        return eventRepository.findEventsWithAvailableTickets(pageable);
+    }
+
+    /**
+     * Get the number of available tickets for a specific event
+     */
+    public int getAvailableTicketsCount(Long eventId) {
+        Event ev = getEventById(eventId);        // throws ResourceNotFoundException
+        return ev.getCapacity() - ev.getParticipantIds().size();
+    }
+
+
+
+    /**
+     * Book tickets for an event
+     */
+    @Transactional
+    public Map<String, Object> bookEventTickets(Long eventId, Long userId, int numberOfTickets) {
+        Event event = getEventById(eventId);
+        
+        // Check if event is published and public
+        if (!event.isPublished() || event.getEventType() != EventType.PUBLIC) {
+            throw new IllegalStateException("Event is not available for booking");
+        }
+        
+        // Check if user is already registered
+        if (event.getParticipantIds().contains(userId)) {
+            throw new IllegalStateException("User already has tickets for this event");
+        }
+        
+        // Check if enough tickets are available
+        int availableTickets = event.getCapacity() - event.getParticipantIds().size();
+        if (availableTickets < numberOfTickets) {
+            throw new IllegalStateException("Not enough tickets available. Available: " + availableTickets);
+        }
+        
+        // Add user to participants
+        event.getParticipantIds().add(userId);
+        eventRepository.save(event);
+        
+        // Prepare response
+        Map<String, Object> response = new HashMap<>();
+        response.put("eventId", eventId);
+        response.put("userId", userId);
+        response.put("numberOfTickets", numberOfTickets);
+        response.put("remainingTickets", availableTickets - numberOfTickets);
+        response.put("status", "CONFIRMED");
+        
+        return response;
+    }
+//    public Page<Event> getAvailableEvents(Pageable pageable) {
+//        return eventRepository.findAvailableEvents(pageable);
+//    }
+//    public Map<String, Object> getEventAvailability(Long eventId) {
+//        Event event = getEventById(eventId);
+//        int totalCapacity = event.getCapacity();
+//        int participantCount = event.getParticipantIds().size();
+//        int availableSeats = totalCapacity - participantCount;
+//
+//        Map<String, Object> availabilityInfo = new HashMap<>();
+//        availabilityInfo.put("eventId", eventId);
+//        availabilityInfo.put("title", event.getTitle());
+//        availabilityInfo.put("totalCapacity", totalCapacity);
+//        availabilityInfo.put("bookedSeats", participantCount);
+//        availabilityInfo.put("availableSeats", availableSeats);
+//        availabilityInfo.put("isAvailable", availableSeats > 0);
+//
+//        return availabilityInfo;
+//    }
+
+
+     // Increment or decrement remaining tickets for an event.
+    public void adjustAvailableTickets(Long eventId, int delta) {
+        Event ev = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + eventId));
+
+        int newAvailable = ev.getAvailableTickets() + delta;
+        if (newAvailable < 0) {
+            throw new IllegalStateException("Not enough tickets for delta " + delta);
+        }
+
+        ev.setAvailableTickets(newAvailable);
+        eventRepository.save(ev);
+    }
+
+}

@@ -9,6 +9,7 @@
         <module name="NotificationService" />
         <module name="BookingService" />
         <module name="UserAuthService" />
+        <module name="SearchService" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -20,6 +21,7 @@
       <module name="AvailabilityService" options="-parameters" />
       <module name="BookingService" options="-parameters" />
       <module name="NotificationService" options="-parameters" />
+      <module name="SearchService" options="-parameters" />
       <module name="UserAuthService" options="-parameters" />
     </option>
   </component>

@@ -1,5 +1,6 @@
 package com.example.hotel.BookingService;
 
+import static org.mockito.Mockito.*;
 import com.example.hotel.BookingService.Clients.AvailabilityClient;
 import com.example.hotel.BookingService.rabbitmq.BookingProducer;
 import com.example.hotel.BookingService.rabbitmq.RabbitMQConfig;
@@ -9,12 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import static org.mockito.Mockito.mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
