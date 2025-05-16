@@ -12,47 +12,62 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import org.springframework.data.domain.PageRequest;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EventServiceTest {
 
     @Mock
     private EventRepository eventRepository;
-    
+
     @Mock
     private CategoryRepository categoryRepository;
-    
+
     @InjectMocks
     private EventService eventService;
 
+    private List<Event> testEvents;
 
 
     @BeforeEach
     void setUp() {
+
         MockitoAnnotations.openMocks(this);
+
+        Event e1 = new Event();
+        e1.setId(1L);
+        e1.setCapacity(100);
+        e1.setParticipantIds(new HashSet<>(Arrays.asList(1L,2L)));
+
+        Event e2 = new Event();
+        e2.setId(2L);
+        e2.setCapacity(50);
+        e2.setParticipantIds(new HashSet<>());
+
+        Event e3 = new Event();
+        e3.setId(3L);
+        e3.setCapacity(200);
+        e3.setParticipantIds(new HashSet<>(Arrays.asList(5L)));
+
+        testEvents = Arrays.asList(e1, e2, e3);
     }
-    
+
     @Test
     void simpleTest() {
         // A simple test that always passes
@@ -60,16 +75,16 @@ class EventServiceTest {
         String actual = "hello";
         assertEquals(expected, actual, "Simple test to verify test setup");
     }
-    
+
     @Test
     void getAllEventsSimpleTest() {
         // Mock data
         List<Event> mockEvents = new ArrayList<>();
         when(eventRepository.findAll()).thenReturn(mockEvents);
-        
+
         // Test
         List<Event> result = eventService.getAllEvents();
-        
+
         // Verify
         assertEquals(mockEvents, result);
     }
@@ -324,9 +339,5 @@ class EventServiceTest {
         assertEquals(0, result.getTotalElements());
         assertTrue(result.getContent().isEmpty());
         verify(eventRepository, times(1)).findEventsWithAvailableTickets(any(Pageable.class));
-    }
-
-
-
-
+}
 }

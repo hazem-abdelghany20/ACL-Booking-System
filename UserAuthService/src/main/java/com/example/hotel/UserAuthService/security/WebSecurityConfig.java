@@ -64,6 +64,7 @@ public class WebSecurityConfig {
                             .requestMatchers("/google-login").permitAll()
                             .requestMatchers("/static/**").permitAll()
 
+
                                 .anyRequest().authenticated()
                 );
         

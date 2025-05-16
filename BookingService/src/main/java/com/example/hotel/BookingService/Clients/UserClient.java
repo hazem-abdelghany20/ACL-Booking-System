@@ -14,7 +14,7 @@ public interface UserClient {
             (@RequestParam("userId") Long userId,
              @RequestParam("amount") Double amount);
 
-    @GetMapping("api/wallet/process")
+    @GetMapping("api/wallet/balance/{userId}")
     ResponseEntity<Map<String,Object>> getBalance (@PathVariable("userId") Long userId);
 
     @PostMapping("/api/users/{userId}/events/{eventId}")
