@@ -5,10 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@FeignClient(name = "event-service", url = "http://localhost:8081")
+@FeignClient(name = "event-service", url = "http://event-service:8081")
 public interface EventClient {
     @GetMapping("/api/events/{id}")
     ResponseEntity<Map<String, Object>> getEvent(@PathVariable("id") Long id);
@@ -33,4 +34,10 @@ public interface EventClient {
 
     @GetMapping("/api/events/{eventId}/available-tickets")
     Map<String, Object> getAvailableTickets(@PathVariable Long eventId);
+
+    @PutMapping("/api/events/{eventId}/available-tickets")
+    void adjustAvailableTickets(
+            @PathVariable Long eventId,
+            @RequestParam("delta") int delta
+    );
 }
