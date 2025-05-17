@@ -1,0 +1,286 @@
+{
+	"id": "797f7902-9135-48a8-a99e-edfd739e0b40",
+	"name": "UserAuth Service API Tests",
+	"timestamp": "2025-05-16T15:59:54.160Z",
+	"collection_id": "26764690-dd302dcd-9129-4226-a77e-c76091d47778",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 0,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-05-16T15:59:52.900Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "8bc48eba-4518-498f-9469-16f97a549046",
+			"name": "Sign Up with Email",
+			"url": "http://localhost:8081/api/auth/signup",
+			"time": 357,
+			"responseCode": {
+				"code": 422,
+				"name": "Unprocessable Entity (WebDAV) (RFC 4918)"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				357
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "340928fc-e71f-4370-9b09-76326ebdb773",
+			"name": "Sign In with Email",
+			"url": "http://localhost:8081/api/auth/signin",
+			"time": 232,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				232
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "85cbe819-b9cf-4ce8-9a70-337069173a09",
+			"name": "Reset Password",
+			"url": "http://localhost:8081/api/auth/reset-password?email=test1@example.com",
+			"time": 11,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "fadbf82b-5c3a-441f-8c1e-454e50b237a8",
+			"name": "Logout",
+			"url": "http://localhost:8081/api/auth/signout",
+			"time": 4,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "7f8c4b36-67b0-4d58-b3f1-4029477effce",
+			"name": "Get Wallet Balance",
+			"url": "http://localhost:8081/api/wallet/09dde273-8a1b-49d5-8185-414a203af355",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "2fca6431-0d57-49c3-adb6-0a17348f666e",
+			"name": "Add Funds",
+			"url": "http://localhost:8081/api/wallet/09dde273-8a1b-49d5-8185-414a203af355/add?amount=50.0",
+			"time": 3,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "2b863283-3a9e-4568-94e6-d939e41453be",
+			"name": "Deduct Funds",
+			"url": "http://localhost:8081/api/wallet/09dde273-8a1b-49d5-8185-414a203af355/deduct?amount=25.0",
+			"time": 3,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "0b08c925-b701-4989-836c-c1bef73b2a0b",
+			"name": "Get Transaction History",
+			"url": "http://localhost:8081/api/wallet/09dde273-8a1b-49d5-8185-414a203af355/transactions",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "6c6ea889-7ffa-4a5d-b91d-a6809735b1ce",
+			"name": "Get Google OAuth URL",
+			"url": "http://localhost:8081/api/oauth/google",
+			"time": 188,
+			"responseCode": {
+				"code": 405,
+				"name": "Method Not Allowed"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				188
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "fce8ab68-277d-473b-b06b-d543c9ab16f1",
+			"name": "OAuth Callback",
+			"url": "http://localhost:8081/api/oauth/callback?code=valid-oauth-code&state=client-state",
+			"time": 148,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				148
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "770157e8-5081-427f-bea2-27d524456540",
+			"name": "Get All Users",
+			"url": "http://localhost:8081/api/users/all",
+			"time": 4,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "d78f795b-ac7c-44bc-82cd-17b584684fff",
+			"name": "Get User Profile",
+			"url": "http://localhost:8081/api/users/profile",
+			"time": 3,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 961,
+	"collection": {
+		"requests": [
+			{
+				"id": "8bc48eba-4518-498f-9469-16f97a549046",
+				"method": "POST"
+			},
+			{
+				"id": "340928fc-e71f-4370-9b09-76326ebdb773",
+				"method": "POST"
+			},
+			{
+				"id": "85cbe819-b9cf-4ce8-9a70-337069173a09",
+				"method": "POST"
+			},
+			{
+				"id": "fadbf82b-5c3a-441f-8c1e-454e50b237a8",
+				"method": "POST"
+			},
+			{
+				"id": "7f8c4b36-67b0-4d58-b3f1-4029477effce",
+				"method": "GET"
+			},
+			{
+				"id": "2fca6431-0d57-49c3-adb6-0a17348f666e",
+				"method": "POST"
+			},
+			{
+				"id": "2b863283-3a9e-4568-94e6-d939e41453be",
+				"method": "POST"
+			},
+			{
+				"id": "0b08c925-b701-4989-836c-c1bef73b2a0b",
+				"method": "GET"
+			},
+			{
+				"id": "6c6ea889-7ffa-4a5d-b91d-a6809735b1ce",
+				"method": "POST"
+			},
+			{
+				"id": "fce8ab68-277d-473b-b06b-d543c9ab16f1",
+				"method": "GET"
+			},
+			{
+				"id": "770157e8-5081-427f-bea2-27d524456540",
+				"method": "GET"
+			},
+			{
+				"id": "d78f795b-ac7c-44bc-82cd-17b584684fff",
+				"method": "GET"
+			}
+		]
+	}
+}

@@ -1,0 +1,10 @@
+
+Œ
+java:S1192*"KDefine a constant instead of duplicating this literal "totalItems" 6 times.(’ø‡ÀûÿÿÿÿJ$aa3de0c0-c242-4f00-bd11-a3a35535abb2
+Œ
+java:S1192+"KDefine a constant instead of duplicating this literal "totalPages" 6 times.(ÄŠ’åûÿÿÿÿJ$ca2a7c9e-d863-4ebc-8fe6-18594f294e12
+
+java:S1192)"LDefine a constant instead of duplicating this literal "currentPage" 6 times.(ø’âÕşÿÿÿÿJ$18eaffa6-8af9-4ea9-b6ee-964f025a5941
+ˆ
+java:S1192("GDefine a constant instead of duplicating this literal "events" 6 times.(µîî¶ùÿÿÿÿJ$f95762fb-f823-43c9-9b61-d356a5e214dd
+•	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ĞÃæßJ$a27ffa36-fd95-4281-875c-1df13b85dd89

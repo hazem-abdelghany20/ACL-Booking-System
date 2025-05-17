@@ -3,56 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Login Test</title>
+    <title>ACL Booking System - Google Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f5f5f5;
+            background-color: #f7f9fc;
+            color: #333;
         }
         .card {
             background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
             text-align: center;
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
         }
-        h1 {
-            color: #4285F4;
+        .logo {
             margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #5469d4;
         }
-        button {
-            background-color: #4285F4;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
+        h1 {
+            color: #32325d;
+            margin-bottom: 16px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        p {
+            color: #6b7c93;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            color: #757575;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            margin: 0 auto;
+            width: 220px;
         }
-        button:hover {
-            background-color: #3367D6;
+        .google-btn:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .google-btn img {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        .or-divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #8898aa;
+            font-size: 12px;
+        }
+        .or-divider::before, .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e6ebf1;
+            margin: 0 10px;
+        }
+        .regular-login {
+            margin-top: 5px;
+        }
+        .regular-login a {
+            color: #5469d4;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .regular-login a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>Supabase Google Login Test</h1>
-        <p>Click the button below to test Google login with Supabase</p>
-        <button id="loginBtn">Login with Google</button>
+        <div class="logo">ACL Booking System</div>
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your bookings, manage reservations, and more.</p>
+        
+        <button id="googleSignInBtn" class="google-btn">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo"> 
+            Sign in with Google
+        </button>
+        
+        <div class="or-divider">OR</div>
+        
+        <div class="regular-login">
+            <a href="/api/auth/signin">Continue with email and password</a>
+        </div>
     </div>
 
     <script>
-        document.getElementById('loginBtn').addEventListener('click', async () => {
+        document.getElementById('googleSignInBtn').addEventListener('click', async () => {
             try {
                 const response = await fetch('/api/oauth/google/redirect');
                 if (response.redirected) {
@@ -62,12 +122,13 @@
                     if (data && data.url) {
                         window.location.href = data.url;
                     } else {
-                        alert('Failed to get Google login URL');
+                        console.error('Failed to get Google login URL');
+                        alert('Error: Failed to initiate Google login. Please try again later.');
                     }
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error initiating Google login');
+                alert('Error initiating Google login. Please try again.');
             }
         });
     </script>

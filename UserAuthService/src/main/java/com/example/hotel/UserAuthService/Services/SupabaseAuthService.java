@@ -1,9 +1,8 @@
 package com.example.hotel.UserAuthService.Services;
 
 import com.example.hotel.UserAuthService.payload.request.EmailAuthRequest;
-import com.example.hotel.UserAuthService.payload.request.OtpVerificationRequest;
-import com.example.hotel.UserAuthService.payload.request.PhoneAuthRequest;
 import com.example.hotel.UserAuthService.payload.response.AuthResponse;
+import com.example.hotel.UserAuthService.payload.response.WalletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,7 +15,12 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @deprecated This service is being replaced by the new auth strategy pattern implementation.
+ * Use {@link com.example.hotel.UserAuthService.auth.service.AuthService} instead.
+ */
 @Service
+@Deprecated
 public class SupabaseAuthService {
     private static final Logger logger = LoggerFactory.getLogger(SupabaseAuthService.class);
     
@@ -74,67 +78,6 @@ public class SupabaseAuthService {
     }
     
     /**
-     * Sign up with phone number (sends OTP)
-     */
-    public Mono<AuthResponse> signUpWithPhone(PhoneAuthRequest request) {
-        logger.info("Signing up user with phone: {}", request.getPhone());
-        
-        Map<String, Object> body = new HashMap<>();
-        body.put("phone", request.getPhone());
-        body.put("password", request.getPassword());
-        
-        return supabaseClient.post()
-                .uri("/auth/v1/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(AuthResponse.class)
-                .doOnSuccess(response -> logger.info("Successfully initiated phone signup with OTP for: {}", request.getPhone()))
-                .doOnError(error -> logger.error("Error signing up user with phone: {}", error.getMessage()));
-    }
-    
-    /**
-     * Verify phone OTP code
-     */
-    public Mono<AuthResponse> verifyPhoneOtp(OtpVerificationRequest request) {
-        logger.info("Verifying OTP for phone: {}", request.getPhone());
-        
-        Map<String, Object> body = new HashMap<>();
-        body.put("phone", request.getPhone());
-        body.put("token", request.getToken());
-        body.put("type", "sms");
-        
-        return supabaseClient.post()
-                .uri("/auth/v1/verify")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(AuthResponse.class)
-                .doOnSuccess(response -> logger.info("Successfully verified OTP for phone: {}", request.getPhone()))
-                .doOnError(error -> logger.error("Error verifying OTP: {}", error.getMessage()));
-    }
-    
-    /**
-     * Sign in with phone (sends OTP)
-     */
-    public Mono<Void> signInWithPhone(PhoneAuthRequest request) {
-        logger.info("Signing in user with phone: {}", request.getPhone());
-        
-        Map<String, Object> body = new HashMap<>();
-        body.put("phone", request.getPhone());
-        body.put("password", request.getPassword());
-        
-        return supabaseClient.post()
-                .uri("/auth/v1/otp")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .doOnSuccess(response -> logger.info("Successfully sent OTP for phone login: {}", request.getPhone()))
-                .doOnError(error -> logger.error("Error sending OTP for phone login: {}", error.getMessage()));
-    }
-    
-    /**
      * Get OAuth URL for Google sign-in
      * @param redirectUrl The URL to redirect to after successful authentication
      * @return URL to redirect the user to for Google sign-in
@@ -183,50 +126,103 @@ public class SupabaseAuthService {
                 .doOnSuccess(response -> logger.info("Successfully got OAuth providers: {}", response))
                 .doOnError(error -> logger.error("Error getting OAuth providers: {}", error.getMessage()));
     }
-
+    
     /**
-     * Request a password reset for the given email.
-     * Supabase will send an email to the user with a reset link.
+     * Reset a user's password by sending a reset email
+     * @param email The email of the user who wants to reset their password
+     * @return Empty Mono indicating the operation completed
      */
-    public Mono<Void> requestPasswordReset(String email) {
+    public Mono<Void> resetPassword(String email) {
         logger.info("Requesting password reset for email: {}", email);
+        
         Map<String, Object> body = new HashMap<>();
         body.put("email", email);
-        // The Supabase endpoint for requesting a password reset is typically /auth/v1/recover
-        // This might need to be adjusted based on specific Supabase project settings or API version.
-        return supabaseAdminClient.post() // Using supabaseAdminClient if admin privileges are needed, or supabaseClient otherwise
-                .uri("/auth/v1/recover") 
+        
+        return supabaseClient.post()
+                .uri("/auth/v1/recover")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(Void.class)
-                .doOnSuccess(response -> logger.info("Successfully requested password reset for email: {}", email))
-                .doOnError(error -> logger.error("Error requesting password reset for email {}: {}", email, error.getMessage()));
+                .doOnSuccess(response -> logger.info("Successfully sent password reset email to: {}", email))
+                .doOnError(error -> logger.error("Error sending password reset email: {}", error.getMessage()));
     }
-
+    
     /**
-     * Update the user's password using a reset token.
-     * This is typically done after the user clicks the link in the password reset email
-     * and is redirected back to our application with a token in the URL.
-     * The actual token processing and redirect URL handling are not covered here
-     * as Supabase usually handles that, and the frontend would extract the token.
-     * This method assumes the token is available to be passed to Supabase.
+     * Get the wallet balance for a user from Supabase
+     * @param userId The ID of the user to get the wallet balance for
+     * @param token Authentication token for the user
+     * @return WalletResponse containing the wallet balance information
      */
-    public Mono<AuthResponse> updateUserPasswordWithToken(String accessToken, String newPassword) {
-        logger.info("Updating user password with access token");
-        Map<String, Object> body = new HashMap<>();
-        body.put("password", newPassword);
-
-        // The Supabase endpoint for updating a user's password with an access token (after they are logged in or have a valid session token)
-        // is /auth/v1/user. The user is identified by the JWT in the Authorization header.
-        return supabaseClient.put() // User-context client
-                .uri("/auth/v1/user")
-                .header("Authorization", "Bearer " + accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(body)
+    public Mono<WalletResponse> getWalletBalance(String userId, String token) {
+        logger.info("Getting wallet balance for user: {}", userId);
+        
+        return supabaseClient.get()
+                .uri("/rest/v1/wallets?user_id=eq." + userId)
+                .header("Authorization", "Bearer " + token)
                 .retrieve()
-                .bodyToMono(AuthResponse.class) // Assuming AuthResponse contains user info
-                .doOnSuccess(response -> logger.info("Successfully updated user password"))
-                .doOnError(error -> logger.error("Error updating user password: {}", error.getMessage()));
+                .bodyToMono(WalletResponse.class)
+                .doOnSuccess(response -> logger.info("Successfully got wallet balance for user: {}", userId))
+                .doOnError(error -> logger.error("Error getting wallet balance: {}", error.getMessage()));
+    }
+    
+    /**
+     * Add funds to a user's wallet in Supabase
+     * @param userId The ID of the user to add funds to
+     * @param amount The amount to add
+     * @param token Authentication token for the user
+     * @return WalletResponse containing the updated wallet information
+     */
+    public Mono<WalletResponse> addFunds(String userId, Double amount, String token) {
+        logger.info("Adding {} funds to wallet for user: {}", amount, userId);
+        
+        return supabaseClient.post()
+                .uri("/rest/v1/rpc/add_funds")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("user_id", userId, "amount", amount))
+                .retrieve()
+                .bodyToMono(WalletResponse.class)
+                .doOnSuccess(response -> logger.info("Successfully added funds to wallet for user: {}", userId))
+                .doOnError(error -> logger.error("Error adding funds to wallet: {}", error.getMessage()));
+    }
+    
+    /**
+     * Deduct funds from a user's wallet in Supabase
+     * @param userId The ID of the user to deduct funds from
+     * @param amount The amount to deduct
+     * @param token Authentication token for the user
+     * @return WalletResponse containing the updated wallet information
+     */
+    public Mono<WalletResponse> deductFunds(String userId, Double amount, String token) {
+        logger.info("Deducting {} funds from wallet for user: {}", amount, userId);
+        
+        return supabaseClient.post()
+                .uri("/rest/v1/rpc/deduct_funds")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("user_id", userId, "amount", amount))
+                .retrieve()
+                .bodyToMono(WalletResponse.class)
+                .doOnSuccess(response -> logger.info("Successfully deducted funds from wallet for user: {}", userId))
+                .doOnError(error -> logger.error("Error deducting funds from wallet: {}", error.getMessage()));
+    }
+    
+    /**
+     * Get transaction history for a user from Supabase
+     * @param userId The ID of the user to get transaction history for
+     * @param token Authentication token for the user
+     * @return Map containing transaction history
+     */
+    public Mono<Map> getTransactionHistory(String userId, String token) {
+        logger.info("Getting transaction history for user: {}", userId);
+        
+        return supabaseClient.get()
+                .uri("/rest/v1/transactions?user_id=eq." + userId + "&order=created_at.desc")
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .doOnSuccess(response -> logger.info("Successfully got transaction history for user: {}", userId))
+                .doOnError(error -> logger.error("Error getting transaction history: {}", error.getMessage()));
     }
 } 

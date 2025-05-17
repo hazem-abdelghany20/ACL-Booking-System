@@ -30,6 +30,10 @@ public class Event {
     @NotNull
     private LocalDateTime endDateTime;
 
+    @NotNull
+    @Column(nullable = false)
+    private Integer availableTickets;
+
     @NotBlank
     @Size(max = 200)
     private String location;
@@ -76,6 +80,8 @@ public class Event {
         this.capacity = capacity;
         this.organizerId = organizerId;
         this.eventType = eventType;
+        this.availableTickets = this.capacity;
+
     }
 
     // Builder pattern implementation
@@ -141,6 +147,12 @@ public class Event {
             event.setCurrency(currency);
             return this;
         }
+
+        public Builder availableTickets(Integer avail) {
+            event.setAvailableTickets(avail);
+            return this;
+        }
+
 
         public Event build() {
             return event;
@@ -266,5 +278,12 @@ public class Event {
 
     public void setParticipantIds(Set<Long> participantIds) {
         this.participantIds = participantIds;
+    }
+
+    public Integer getAvailableTickets() {
+        return availableTickets;
+    }
+    public void setAvailableTickets(Integer availableTickets) {
+        this.availableTickets = availableTickets;
     }
 } 

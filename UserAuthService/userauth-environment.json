@@ -1,0 +1,31 @@
+{
+  "id": "9dc42c8a-2de2-4931-b7c5-7e4dd80fdda0",
+  "name": "UserAuth Service Environment",
+  "values": [
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "user_id",
+      "value": "09dde273-8a1b-49d5-8185-414a203af355",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+} 

@@ -32,9 +32,7 @@ public class EventService {
     
     @Autowired
     private CategoryRepository categoryRepository;
-
-
-
+    
     // Event CRUD Operations
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
@@ -277,9 +275,11 @@ public class EventService {
      * Get the number of available tickets for a specific event
      */
     public int getAvailableTicketsCount(Long eventId) {
-        Event event = getEventById(eventId);
-        return event.getCapacity() - event.getParticipantIds().size();
+        Event ev = getEventById(eventId);        // throws ResourceNotFoundException
+        return ev.getCapacity() - ev.getParticipantIds().size();
     }
+
+
 
     /**
      * Book tickets for an event
@@ -287,27 +287,27 @@ public class EventService {
     @Transactional
     public Map<String, Object> bookEventTickets(Long eventId, Long userId, int numberOfTickets) {
         Event event = getEventById(eventId);
-
+        
         // Check if event is published and public
         if (!event.isPublished() || event.getEventType() != EventType.PUBLIC) {
             throw new IllegalStateException("Event is not available for booking");
         }
-
+        
         // Check if user is already registered
         if (event.getParticipantIds().contains(userId)) {
             throw new IllegalStateException("User already has tickets for this event");
         }
-
+        
         // Check if enough tickets are available
         int availableTickets = event.getCapacity() - event.getParticipantIds().size();
         if (availableTickets < numberOfTickets) {
             throw new IllegalStateException("Not enough tickets available. Available: " + availableTickets);
         }
-
+        
         // Add user to participants
         event.getParticipantIds().add(userId);
         eventRepository.save(event);
-
+        
         // Prepare response
         Map<String, Object> response = new HashMap<>();
         response.put("eventId", eventId);
@@ -315,7 +315,7 @@ public class EventService {
         response.put("numberOfTickets", numberOfTickets);
         response.put("remainingTickets", availableTickets - numberOfTickets);
         response.put("status", "CONFIRMED");
-
+        
         return response;
     }
 //    public Page<Event> getAvailableEvents(Pageable pageable) {
@@ -337,4 +337,20 @@ public class EventService {
 //
 //        return availabilityInfo;
 //    }
+
+
+     // Increment or decrement remaining tickets for an event.
+    public void adjustAvailableTickets(Long eventId, int delta) {
+        Event ev = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + eventId));
+
+        int newAvailable = ev.getAvailableTickets() + delta;
+        if (newAvailable < 0) {
+            throw new IllegalStateException("Not enough tickets for delta " + delta);
+        }
+
+        ev.setAvailableTickets(newAvailable);
+        eventRepository.save(ev);
+    }
+
 }
