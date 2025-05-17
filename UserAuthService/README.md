@@ -1,143 +1,88 @@
-# UserAuthService
+# User Authentication Service
 
-A Spring Boot microservice for user authentication and authorization using Supabase as the authentication provider.
-
-## Overview
-
-This microservice implements authentication features for an event booking platform using Supabase's authentication services. The implementation provides a comprehensive set of authentication methods including email/password, phone number with OTP verification, and Google OAuth.
+This service handles user authentication and wallet functionality for the ACL Booking System.
 
 ## Features
 
-- **Email Authentication**
-  - User signup with email and password
-  - User signin with email and password
-  
-- **Phone Authentication**
-  - User signup with phone number
-  - Phone number verification with OTP
-  - User signin with phone number and OTP
-  
-- **OAuth Authentication**
-  - Google OAuth integration
-  - OAuth callback handling
-  
-- **Security Implementation**
-  - Integration with Spring Security
-  - Secured API endpoints
-  - Cross-Origin Resource Sharing (CORS) configuration
-  
-## Technical Implementation
+- Email authentication via Supabase
+- Google OAuth authentication
+- Session management using the Singleton pattern
+- Authentication strategies using the Strategy pattern
+- Wallet management for users
+- Password reset functionality
 
-### API Endpoints
-
-The service exposes the following endpoints:
-
-- `/api/auth/*` - Core authentication endpoints
-- `/api/supabase/*` - Supabase-specific authentication operations
-- `/api/oauth/*` - OAuth authentication flows
-
-### Architecture
-
-- **WebClient Integration**: Uses Spring WebClient to interact with Supabase REST APIs
-- **Reactive Programming**: Implemented with Project Reactor for asynchronous operations
-- **Microservice Design**: Part of a larger event booking system, focusing solely on authentication concerns
-
-### Data Models
-
-- **Request/Response Models**:
-  - `EmailAuthRequest` - For email-based authentication
-  - `PhoneAuthRequest` - For phone-based authentication
-  - `OtpVerificationRequest` - For verifying OTP codes
-  - `AuthResponse` - Standardized authentication response
-
-### Security Configuration
-
-- Configured Spring Security to secure endpoints
-- Permitted access to authentication endpoints
-- Implemented CSRF protection
-- Configured CORS for cross-domain requests
-
-## Testing Infrastructure
-
-### Unit Tests
-
-- Unit tests with mocked WebClient responses
-- Tests for controllers and services
-
-### Integration Tests
-
-- Integration tests for Supabase API interactions
-- Custom test configuration for security
-- Test-specific application properties
-
-### Test Categories
-
-- **Controller Tests**: Testing API endpoints
-  - `OAuthControllerTest` - Tests for OAuth endpoints
-  - `AuthControllerTest` - Tests for auth endpoints
-  
-- **Service Tests**:
-  - `SupabaseAuthServiceTest` - Unit tests for auth service
-  - `SupabaseAuthServiceIntegrationTest` - Integration tests with Supabase
-
-## Configuration
-
-### Application Properties
-
-- Development and production configurations
-- Test-specific configurations
-- Supabase API configuration
-
-### Environment Variables
-
-- Supabase URL
-- Supabase API key
-- Supabase Secret key
-
-## Technical Challenges Solved
-
-1. **Supabase Java Integration**: Implemented a custom WebClient-based integration in the absence of an official Java SDK.
-
-2. **Error Handling**: Created a robust error handling mechanism for WebClient errors with `GlobalExceptionHandler`.
-
-3. **OAuth Flow**: Implemented complete OAuth flow for Google authentication.
-
-4. **Testing Challenges**: 
-   - Resolved package name casing inconsistencies
-   - Implemented custom security configuration for tests
-   - Created error handling for API limitations in integration tests
-
-5. **API Version Compatibility**: Adapted to Supabase API changes by handling HTTP method limitations in tests.
-
-## Development Guide
+## Setup and Running
 
 ### Prerequisites
 
-- Java 23
-- Maven 3.8+
-- Supabase account with API keys
-
-### Building the Service
-
-```bash
-mvn clean package
-```
+- Java 23 or higher
+- Maven 3.8 or higher
+- Supabase project with the required tables and functions
 
 ### Running the Service
 
-```bash
-java -jar target/UserAuthService-0.0.1-SNAPSHOT.jar
-```
+1. Make sure you have Java 23 installed:
+   ```
+   java -version
+   ```
 
-### Running Tests
+2. Set the JAVA_HOME environment variable:
+   ```
+   export JAVA_HOME=/path/to/java23
+   ```
 
-```bash
-mvn test
-```
+3. Run the service using Maven:
+   ```
+   mvn org.springframework.boot:spring-boot-maven-plugin:run
+   ```
 
-## Future Improvements
+   Or using the provided script:
+   ```
+   ./run.sh
+   ```
 
-- Implement refresh token handling
-- Add more OAuth providers (Facebook, Twitter, etc.)
-- Implement role-based authorization
-- Add rate limiting for authentication attempts 
+### Setting up Supabase
+
+1. Create a Supabase project and enable Email and Google authentication
+
+2. For wallet functionality, execute the SQL in `src/main/resources/supabase-wallet-setup.sql` in the Supabase SQL editor
+
+3. Configure the Supabase URL and API key in `src/main/resources/application.properties`
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/auth/signup` - Register with email/password
+- `POST /api/auth/signin` - Login with email/password
+- `POST /api/auth/signout` - Logout
+- `POST /api/auth/reset-password` - Request password reset email
+- `GET /api/auth/validate` - Validate session
+
+### OAuth
+
+- `GET /api/oauth/google` - Get Google sign-in URL
+- `GET /api/oauth/callback` - OAuth callback endpoint
+- `GET /api/oauth/google/redirect` - Redirect to Google sign-in
+
+### Wallet
+
+- `GET /api/wallet/balance` - Get wallet balance
+- `POST /api/wallet/add-funds` - Add funds to wallet
+- `POST /api/wallet/deduct-funds` - Deduct funds from wallet
+
+## Design Patterns
+
+This service uses the following design patterns:
+
+1. **Strategy Pattern** - For different authentication mechanisms (email, Google)
+2. **Singleton Pattern** - For session management
+3. **Factory Pattern** - For creating authentication strategies
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request 

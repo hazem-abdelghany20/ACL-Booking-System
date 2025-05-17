@@ -1,64 +1,112 @@
 package com.example.hotel.UserAuthService.Controllers;
 
-
-import com.example.hotel.UserAuthService.Services.WalletService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.hotel.UserAuthService.Services.SupabaseAuthService;
+import com.example.hotel.UserAuthService.payload.response.WalletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+/**
+ * Controller for wallet operations
+ */
 @RestController
 @RequestMapping("/api/wallet")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class WalletController {
 
-    @Autowired
-    private WalletService walletService;
+    private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
 
-    @PostMapping("/process")
-    public ResponseEntity<Map<String, Object>> processPayment(
-            @RequestParam Long userId,
-            @RequestParam Double amount) {
+    private final SupabaseAuthService supabaseAuthService;
 
-        boolean success = walletService.processPayment(userId, amount);
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("success", success);
-        if (success) {
-            response.put("message", "Payment processed successfully");
-            response.put("remainingBalance", walletService.getBalance(userId));
-            return ResponseEntity.ok(response);
-        } else {
-            response.put("message", "Insufficient balance");
-            return ResponseEntity.badRequest().body(response);
-        }
+    public WalletController(SupabaseAuthService supabaseAuthService) {
+        this.supabaseAuthService = supabaseAuthService;
     }
 
-    @PostMapping("/deposit")
-    public ResponseEntity<Map<String, Object>> depositToWallet(
-            @RequestParam Long userId,
-            @RequestParam Double amount) {
+    /**
+     * Get the balance of the user's wallet
+     * @param userId User ID
+     * @param token Authorization token
+     * @return Wallet balance
+     */
+    @GetMapping("/balance")
+    public Mono<ResponseEntity<WalletResponse>> getBalance(
+            @RequestParam String userId,
+            @RequestHeader("Authorization") String token) {
+        logger.info("Getting wallet balance for user: {}", userId);
 
-        Double newBalance = walletService.depositToWallet(userId, amount);
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("success", true);
-        response.put("message", "Funds added successfully");
-        response.put("newBalance", newBalance);
-
-        return ResponseEntity.ok(response);
+        return supabaseAuthService.getWalletBalance(userId, token)
+                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @GetMapping("/balance/{userId}")
-    public ResponseEntity<Map<String, Object>> getBalance(@PathVariable Long userId) {
-        Double balance = walletService.getBalance(userId);
+    /**
+     * Get the balance of the user's wallet (alternative method)
+     * Same functionality but to match test naming
+     */
+    @GetMapping("/balance-alt")
+    public Mono<ResponseEntity<WalletResponse>> getWalletBalance(
+            @RequestParam String userId,
+            @RequestHeader("Authorization") String token) {
+        return getBalance(userId, token);
+    }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("userId", userId);
-        response.put("balance", balance);
+    /**
+     * Add funds to the user's wallet
+     * @param userId User ID
+     * @param amount Amount to add
+     * @param token Authorization token
+     * @return Updated wallet
+     */
+    @PostMapping("/add-funds")
+    public Mono<ResponseEntity<WalletResponse>> addFunds(
+            @RequestParam String userId,
+            @RequestParam Double amount,
+            @RequestHeader("Authorization") String token) {
+        logger.info("Adding funds to wallet: {} for user: {}", amount, userId);
 
-        return ResponseEntity.ok(response);
+        return supabaseAuthService.addFunds(userId, amount, token)
+                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+    }
+
+    /**
+     * Deduct funds from the user's wallet
+     * @param userId User ID
+     * @param amount Amount to deduct
+     * @param token Authorization token
+     * @return Updated wallet
+     */
+    @PostMapping("/deduct-funds")
+    public Mono<ResponseEntity<WalletResponse>> deductFunds(
+            @RequestParam String userId,
+            @RequestParam Double amount,
+            @RequestHeader("Authorization") String token) {
+        logger.info("Deducting funds from wallet: {} for user: {}", amount, userId);
+
+        return supabaseAuthService.deductFunds(userId, amount, token)
+                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+    }
+
+    /**
+     * Get transaction history for a user
+     * @param userId User ID
+     * @param token Authorization token
+     * @return Transaction history
+     */
+    @GetMapping("/transactions")
+    public Mono<ResponseEntity<Map>> getTransactionHistory(
+            @RequestParam String userId,
+            @RequestHeader("Authorization") String token) {
+        logger.info("Getting transaction history for user: {}", userId);
+
+        return supabaseAuthService.getTransactionHistory(userId, token)
+                .map(transactions -> ResponseEntity.ok().body(transactions))
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 }
