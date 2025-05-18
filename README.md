@@ -4,7 +4,7 @@ A microservice-based event booking platform for managing events, registrations, 
 
 ## Project Structure
 
-This project consists of five microservices, each responsible for specific domain functionality:
+This project consists of six microservices, each responsible for specific domain functionality:
 
 ### UserAuthService
 
@@ -63,6 +63,17 @@ Features:
 - Integration with EventService for data retrieval
 - Optimized search results with filtering
 
+### ApiGateway
+
+API Gateway that routes client requests to appropriate services.
+
+Features:
+- Centralized routing for all microservices
+- Authentication and authorization middleware
+- Security configurations with JWT validation
+- Redis-based session management
+- Cross-Origin Resource Sharing (CORS) support
+
 ## Technology Stack
 
 - **Backend**: Spring Boot, Java 23
@@ -70,13 +81,16 @@ Features:
 - **API Communication**: OpenFeign for service-to-service calls
 - **Authentication**: Supabase
 - **Database**: PostgreSQL, H2 (for tests)
+- **Caching**: Redis for session management
 - **Testing**: JUnit 5, Mockito
 - **Build Tool**: Maven
 - **Containerization**: Docker
+- **API Gateway**: Spring Cloud Gateway
 
 ## Architecture
 
 The system follows a microservice architecture pattern with:
+- Centralized API Gateway for client communication
 - Service-to-service communication via REST APIs and message queues
 - Event-driven architecture for real-time updates
 - Repository pattern for data access
@@ -105,8 +119,64 @@ To run all services with their dependencies:
 docker-compose up
 ```
 
+### Testing the Full Application
+
+To test the complete application with all microservices:
+
+1. **Start all services using Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Access the application through the API Gateway**:
+   Once all services are up and running, access the API Gateway at:
+   ```
+   http://localhost:8000
+   ```
+   
+   All API requests should be made to this endpoint, which will route to the appropriate service.
+
+3. **Test individual endpoints**:
+   - Authentication: `http://localhost:8000/api/auth/login`
+   - Events: `http://localhost:8000/api/events`
+   - Bookings: `http://localhost:8000/api/bookings`
+   - Notifications: `http://localhost:8000/api/notifications`
+   - Search: `http://localhost:8000/api/search`
+
+4. **Use Postman or cURL to test APIs**:
+   You can use tools like Postman to create and test API requests, for example:
+   ```bash
+   curl -X GET http://localhost:8000/api/events
+   ```
+
+5. **Monitor logs**:
+   Monitor service logs to track request flow and debug issues:
+   ```bash
+   docker-compose logs -f api-gateway
+   ```
+   
+   Or to view logs for a specific service:
+   ```bash
+   docker-compose logs -f [service-name]
+   ```
+
+6. **Access RabbitMQ Management Console**:
+   Monitor message queues at:
+   ```
+   http://localhost:15672
+   ```
+   (login with guest/guest)
+
 ### Testing
+
+To run tests for individual services:
 
 ```bash
 mvn test
+```
+
+To run integration tests:
+
+```bash
+mvn verify
 ```

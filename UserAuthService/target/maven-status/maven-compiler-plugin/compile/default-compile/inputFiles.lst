@@ -20,6 +20,7 @@
 /Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/config/GlobalExceptionHandler.java
 /Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/config/RedisSessionConfig.java
 /Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/config/SupabaseConfig.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/config/WebSecurityConfig.java
 /Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/models/ERole.java
 /Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/models/Role.java
 /Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/main/java/com/example/hotel/UserAuthService/models/User.java
