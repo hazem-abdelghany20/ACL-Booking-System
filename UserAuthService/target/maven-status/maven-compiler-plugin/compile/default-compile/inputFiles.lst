@@ -1,29 +1,40 @@
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\config\GlobalExceptionHandler.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\config\SupabaseConfig.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\AuthController.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\OAuthController.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\PaymentController.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\SupabaseAuthController.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\UserController.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\UserEventController.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\WebController.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\models\ERole.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\models\Role.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\models\User.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\EmailAuthRequest.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\LoginRequest.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\OtpVerificationRequest.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\PhoneAuthRequest.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\SignupRequest.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\response\AuthResponse.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\response\JwtResponse.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\response\MessageResponse.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\repositories\RoleRepository.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\repositories\UserRepository.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\security\services\UserDetailsImpl.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\security\services\UserDetailsServiceImpl.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\security\WebSecurityConfig.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Services\PaymentService.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Services\SupabaseAuthService.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Services\UserEventService.java
-C:\Users\DELL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\UserAuthServiceApplication.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\auth\factory\AuthStrategyFactory.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\auth\service\AuthService.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\auth\session\SessionManager.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\auth\strategy\AuthStrategy.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\auth\strategy\EmailAuthStrategy.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\auth\strategy\GoogleAuthStrategy.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\config\GlobalExceptionHandler.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\config\RedisSessionConfig.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\config\SupabaseConfig.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\config\WebSecurityConfig.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\AuthController.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\OAuthController.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\SupabaseAuthController.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\UserController.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\UserEventController.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\WalletController.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Controllers\WebController.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\models\ERole.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\models\Role.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\models\User.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\models\Wallet.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\EmailAuthRequest.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\LoginRequest.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\ResetPasswordRequest.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\SignupRequest.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\request\WalletTransactionRequest.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\response\AuthResponse.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\response\JwtResponse.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\response\MessageResponse.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\payload\response\WalletResponse.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\repositories\RoleRepository.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\repositories\UserRepository.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\repositories\UserRepositoryImpl.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\security\services\UserDetailsImpl.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\security\services\UserDetailsServiceImpl.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\security\WebSecurityConfig.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Services\SupabaseAuthService.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Services\UserEventService.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\Services\WalletService.java
+C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\main\java\com\example\hotel\UserAuthService\UserAuthServiceApplication.java

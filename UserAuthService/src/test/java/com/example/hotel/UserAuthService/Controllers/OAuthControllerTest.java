@@ -38,7 +38,7 @@ public class OAuthControllerTest {
         // Prepare mock response
         Map<String, String> mockResponse = new HashMap<>();
         mockResponse.put("url", "https://accounts.google.com/o/oauth2/auth?some-params");
-        
+
         when(supabaseAuthService.getGoogleSignInUrl(anyString())).thenReturn(Mono.just(mockResponse));
 
         // Test the endpoint
@@ -57,7 +57,7 @@ public class OAuthControllerTest {
         // Prepare mock response
         AuthResponse mockResponse = new AuthResponse();
         mockResponse.setAccessToken("mock-access-token");
-        
+
         when(supabaseAuthService.exchangeCodeForSession(anyString())).thenReturn(Mono.just(mockResponse));
 
         // Test the endpoint
@@ -69,4 +69,4 @@ public class OAuthControllerTest {
             .expectBody()
             .jsonPath("$.access_token").isEqualTo("mock-access-token");
     }
-} 
+}

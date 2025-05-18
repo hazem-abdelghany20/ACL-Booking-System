@@ -38,7 +38,7 @@ public class SupabaseAuthServiceIntegrationTest {
                 System.out.println("Expected 404 error from providers endpoint: " + ex.getMessage());
                 return Mono.just(Map.of("status", "404_expected"));
             });
-        
+
         StepVerifier.create(providersMono)
             .assertNext(response -> {
                 assertNotNull(response);
@@ -46,7 +46,7 @@ public class SupabaseAuthServiceIntegrationTest {
             })
             .verifyComplete();
     }
-    
+
     /**
      * Test email sign-up
      * Disabled by default to prevent creating real accounts during automated testing
@@ -57,7 +57,7 @@ public class SupabaseAuthServiceIntegrationTest {
         EmailAuthRequest request = new EmailAuthRequest();
         request.setEmail("test" + System.currentTimeMillis() + "@example.com");
         request.setPassword("password123");
-        
+
         StepVerifier.create(supabaseAuthService.signUpWithEmail(request))
             .assertNext(response -> {
                 assertNotNull(response);
@@ -65,7 +65,7 @@ public class SupabaseAuthServiceIntegrationTest {
             })
             .verifyComplete();
     }
-    
+
     /**
      * Test Google OAuth URL generation
      * This test now handles the possibility of a 405 Method Not Allowed error
@@ -74,7 +74,7 @@ public class SupabaseAuthServiceIntegrationTest {
     @Test
     public void testGoogleOAuthUrlGeneration() {
         String redirectUrl = "http://localhost:8081/api/oauth/callback";
-        
+
         Mono<Map> oauthUrlMono = supabaseAuthService.getGoogleSignInUrl(redirectUrl)
             .onErrorResume(WebClientResponseException.MethodNotAllowed.class, ex -> {
                 // If we get a 405 error, we'll consider it a "success" for this test
@@ -85,7 +85,7 @@ public class SupabaseAuthServiceIntegrationTest {
                     "status", "405_expected"
                 ));
             });
-        
+
         StepVerifier.create(oauthUrlMono)
             .assertNext(response -> {
                 assertNotNull(response);
@@ -94,4 +94,4 @@ public class SupabaseAuthServiceIntegrationTest {
             })
             .verifyComplete();
     }
-} 
+}
