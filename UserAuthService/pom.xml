@@ -159,9 +159,6 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<release>${java.version}</release>
-					<compilerArgs>
-						<arg>--enable-preview</arg>
-					</compilerArgs>
 					<forceJavacCompilerUse>true</forceJavacCompilerUse>
 				</configuration>
 			</plugin>
@@ -169,7 +166,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>--enable-preview</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
