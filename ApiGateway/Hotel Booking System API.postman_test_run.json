@@ -1,0 +1,418 @@
+{
+	"id": "8765d8f2-6434-490b-a903-ee27fa1ee957",
+	"name": "Hotel Booking System API",
+	"timestamp": "2025-05-18T06:51:04.253Z",
+	"collection_id": "26764690-6055ef2e-1e6f-4c0b-a296-66cfb656cc8b",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 0,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-05-18T06:51:03.805Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "8944f26d-c84c-4027-90b7-1183460df3da",
+			"name": "Register User",
+			"url": "http://localhost:8000/api/auth/signup",
+			"time": 35,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				35
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "d7d53ff4-14ff-40b9-a51c-8f2a3f92a4f3",
+			"name": "Login User",
+			"url": "http://localhost:8000/api/auth/signin",
+			"time": 5,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				5
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "9fa84f9b-bc24-4e22-a5c0-30e31d3b7b8c",
+			"name": "Get User Profile",
+			"url": "http://localhost:8000/api/users/profile",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				6
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "66ac9510-009e-4fad-ac68-b97400d0258c",
+			"name": "Update User Profile",
+			"url": "http://localhost:8000/api/users/profile",
+			"time": 4,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "62dd21f9-1087-49d4-8cc4-3668c752b97a",
+			"name": "Get Public Events",
+			"url": "http://localhost:8000/api/events/public",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "2a96bee5-cc0a-4ba8-92f8-b098397e50e3",
+			"name": "Get Event Details",
+			"url": "http://localhost:8000/api/events/1",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				5
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "54a6b4ed-3ea2-4882-9e67-de43ad4cec19",
+			"name": "Create Event",
+			"url": "http://localhost:8000/api/events",
+			"time": 3,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "4f8303e0-a3aa-4aed-b64d-b60a7d560f63",
+			"name": "Update Event",
+			"url": "http://localhost:8000/api/events/1",
+			"time": 4,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "00aff89b-67fb-4ace-a04f-2c6f51e465f3",
+			"name": "Delete Event",
+			"url": "http://localhost:8000/api/events/1",
+			"time": 3,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "41b1704e-9986-458c-b678-fe517529a122",
+			"name": "Get Event Categories",
+			"url": "http://localhost:8000/api/categories",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "bd640fd9-7095-4399-89c1-90d6a1a32fab",
+			"name": "Create Booking",
+			"url": "http://localhost:8000/api/bookings",
+			"time": 4,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				4
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "596d71bb-8c52-4d4e-9dbf-089aec8f6301",
+			"name": "Get User Bookings",
+			"url": "http://localhost:8000/api/bookings/user",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				6
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "4ab77470-7f73-49e2-a02e-dde672f1a3d2",
+			"name": "Get Booking Details",
+			"url": "http://localhost:8000/api/bookings/1",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				6
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "43d66687-7ee4-4837-8518-46f1cab43eb3",
+			"name": "Cancel Booking",
+			"url": "http://localhost:8000/api/bookings/1",
+			"time": 3,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "5c384697-968b-4d09-94e8-2d0591a1ec16",
+			"name": "Get User Notifications",
+			"url": "http://localhost:8000/api/notifications",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				5
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "14ad34f8-5d01-4626-8156-140746435192",
+			"name": "Mark Notification as Read",
+			"url": "http://localhost:8000/api/notifications/1/read",
+			"time": 3,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "a8159f54-74a8-4bd1-9939-dcf0c4fe55e8",
+			"name": "Delete Notification",
+			"url": "http://localhost:8000/api/notifications/1",
+			"time": 5,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				5
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "404ace13-1bf6-4a07-9484-961690fb4ffa",
+			"name": "Search Events",
+			"url": "http://localhost:8000/api/events/search?query=concert&category=1&startDate=2025-05-01&endDate=2025-12-31&minPrice=10&maxPrice=100",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				6
+			],
+			"allTests": [
+				{}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 111,
+	"collection": {
+		"requests": [
+			{
+				"id": "8944f26d-c84c-4027-90b7-1183460df3da",
+				"method": "POST"
+			},
+			{
+				"id": "d7d53ff4-14ff-40b9-a51c-8f2a3f92a4f3",
+				"method": "POST"
+			},
+			{
+				"id": "9fa84f9b-bc24-4e22-a5c0-30e31d3b7b8c",
+				"method": "GET"
+			},
+			{
+				"id": "66ac9510-009e-4fad-ac68-b97400d0258c",
+				"method": "PUT"
+			},
+			{
+				"id": "62dd21f9-1087-49d4-8cc4-3668c752b97a",
+				"method": "GET"
+			},
+			{
+				"id": "2a96bee5-cc0a-4ba8-92f8-b098397e50e3",
+				"method": "GET"
+			},
+			{
+				"id": "54a6b4ed-3ea2-4882-9e67-de43ad4cec19",
+				"method": "POST"
+			},
+			{
+				"id": "4f8303e0-a3aa-4aed-b64d-b60a7d560f63",
+				"method": "PUT"
+			},
+			{
+				"id": "00aff89b-67fb-4ace-a04f-2c6f51e465f3",
+				"method": "DELETE"
+			},
+			{
+				"id": "41b1704e-9986-458c-b678-fe517529a122",
+				"method": "GET"
+			},
+			{
+				"id": "bd640fd9-7095-4399-89c1-90d6a1a32fab",
+				"method": "POST"
+			},
+			{
+				"id": "596d71bb-8c52-4d4e-9dbf-089aec8f6301",
+				"method": "GET"
+			},
+			{
+				"id": "4ab77470-7f73-49e2-a02e-dde672f1a3d2",
+				"method": "GET"
+			},
+			{
+				"id": "43d66687-7ee4-4837-8518-46f1cab43eb3",
+				"method": "DELETE"
+			},
+			{
+				"id": "5c384697-968b-4d09-94e8-2d0591a1ec16",
+				"method": "GET"
+			},
+			{
+				"id": "14ad34f8-5d01-4626-8156-140746435192",
+				"method": "PUT"
+			},
+			{
+				"id": "a8159f54-74a8-4bd1-9939-dcf0c4fe55e8",
+				"method": "DELETE"
+			},
+			{
+				"id": "404ace13-1bf6-4a07-9484-961690fb4ffa",
+				"method": "GET"
+			}
+		]
+	}
+}
