@@ -5,6 +5,7 @@ import com.example.hotel.UserAuthService.payload.response.AuthResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -31,26 +32,42 @@ public class OAuthController {
         this.authService = authService;
     }
     
-    @RequestMapping(value = "/google", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/google", method = {RequestMethod.GET, RequestMethod.POST}, 
+                   produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Map>> getGoogleSignInUrl() {
         logger.info("Initiating Google sign-in");
         return authService.getGoogleSignInUrl()
-                .map(ResponseEntity::ok);
+                .map(response -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(response));
     }
     
-    @GetMapping("/callback")
-    public Mono<RedirectView> handleOAuthCallback(@RequestParam("code") String code) {
+    @GetMapping(value = "/callback", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<AuthResponse>> handleOAuthCallback(@RequestParam("code") String code) {
         logger.info("Received OAuth callback with code");
         return authService.authenticateWithGoogle(code)
                 .map(response -> {
                     logger.info("Successfully authenticated with Supabase via Google");
-                    // Redirect to frontend with token
-                    String redirectTo = frontendUrl + "/auth-success?token=" + response.getAccessToken() + 
-                                       "&refresh_token=" + response.getRefreshToken() + 
-                                       "&expires_in=" + response.getExpiresIn();
-                    return new RedirectView(redirectTo);
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(response);
                 })
-                .defaultIfEmpty(new RedirectView(frontendUrl + "/auth-error?message=Authentication%20failed"));
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+    
+    /**
+     * Helper method to redirect the browser to an auth success page
+     */
+    @GetMapping("/success")
+    public Mono<RedirectView> redirectToSuccess(@RequestParam("token") String token,
+                                             @RequestParam("refresh_token") String refreshToken,
+                                             @RequestParam(value = "expires_in", required = false) Long expiresIn) {
+        String redirectTo = frontendUrl + "/auth-success?token=" + token + 
+                           "&refresh_token=" + refreshToken;
+        if (expiresIn != null) {
+            redirectTo += "&expires_in=" + expiresIn;
+        }
+        return Mono.just(new RedirectView(redirectTo));
     }
     
     /**

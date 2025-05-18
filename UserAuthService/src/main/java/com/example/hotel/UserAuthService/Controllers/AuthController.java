@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.hotel.UserAuthService.Services.SupabaseAuthService;
 import com.example.hotel.UserAuthService.payload.request.EmailAuthRequest;
 import com.example.hotel.UserAuthService.payload.request.LoginRequest;
+import com.example.hotel.UserAuthService.payload.request.OtpVerificationRequest;
+import com.example.hotel.UserAuthService.payload.request.PhoneAuthRequest;
 import com.example.hotel.UserAuthService.payload.request.SignupRequest;
 import com.example.hotel.UserAuthService.payload.response.AuthResponse;
 import com.example.hotel.UserAuthService.payload.response.MessageResponse;
@@ -64,5 +66,38 @@ public class AuthController {
         // Basic placeholder for password reset
         return ResponseEntity.ok(new MessageResponse("Password reset functionality not implemented yet"));
     }
-
+    
+    @PostMapping("/email/signup")
+    public Mono<ResponseEntity<AuthResponse>> signUpWithEmail(@Valid @RequestBody EmailAuthRequest emailAuthRequest) {
+        return supabaseAuthService.signUpWithEmail(emailAuthRequest)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
+    
+    @PostMapping("/email/signin")
+    public Mono<ResponseEntity<AuthResponse>> signInWithEmail(@Valid @RequestBody EmailAuthRequest emailAuthRequest) {
+        return supabaseAuthService.signInWithEmail(emailAuthRequest)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+    
+    @PostMapping("/phone/signup")
+    public Mono<ResponseEntity<AuthResponse>> signUpWithPhone(@Valid @RequestBody PhoneAuthRequest phoneAuthRequest) {
+        return supabaseAuthService.signUpWithPhone(phoneAuthRequest)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
+    
+    @PostMapping("/phone/signin")
+    public Mono<ResponseEntity<Void>> signInWithPhone(@Valid @RequestBody PhoneAuthRequest phoneAuthRequest) {
+        return supabaseAuthService.signInWithPhone(phoneAuthRequest)
+                .thenReturn(ResponseEntity.ok().build());
+    }
+    
+    @PostMapping("/phone/verify-otp")
+    public Mono<ResponseEntity<AuthResponse>> verifyPhoneOtp(@Valid @RequestBody OtpVerificationRequest otpRequest) {
+        return supabaseAuthService.verifyPhoneOtp(otpRequest)
+                .map(response -> ResponseEntity.ok(response))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
 } 

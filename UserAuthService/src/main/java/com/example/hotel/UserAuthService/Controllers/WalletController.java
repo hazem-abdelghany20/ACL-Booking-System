@@ -1,22 +1,19 @@
 package com.example.hotel.UserAuthService.Controllers;
 
-import com.example.hotel.UserAuthService.Services.SupabaseAuthService;
+import com.example.hotel.UserAuthService.Services.MockWalletService;
 import com.example.hotel.UserAuthService.payload.response.WalletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Controller for wallet operations
+ * Controller for wallet operations using the mock wallet service
  */
 @RestController
 @RequestMapping("/api/wallet")
@@ -25,36 +22,56 @@ public class WalletController {
 
     private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
 
-    private final SupabaseAuthService supabaseAuthService;
-    private final WebClient supabaseClient;
+    private final MockWalletService mockWalletService;
 
-    @Value("${supabase.url}")
-    private String supabaseUrl;
-
-    @Value("${supabase.key}")
-    private String supabaseKey;
-
-    public WalletController(SupabaseAuthService supabaseAuthService, WebClient supabaseClient) {
-        this.supabaseAuthService = supabaseAuthService;
-        this.supabaseClient = supabaseClient;
+    public WalletController(MockWalletService mockWalletService) {
+        this.mockWalletService = mockWalletService;
     }
 
     // Helper method to extract token
     private String extractToken(String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
+            return authHeader.substring(7).trim();
         }
-        return authHeader;
+        return null; // Return null instead of potentially invalid token
     }
 
-    /**
-     * Get the balance of the user's wallet
-     * @param userId User ID
-     * @param authHeader Authorization token
-     * @return Wallet balance
-     */
+//    @GetMapping("/balance")
+//    public Mono<ResponseEntity<WalletResponse>> getBalance(
+//            @RequestParam String userId,
+//            @RequestHeader("Authorization") String authHeader) {
+//        logger.info("Getting wallet balance for user: {}", userId);
+//
+//        // Extract the token properly
+//        String token = extractToken(authHeader);
+//
+//        if (token == null) {
+//            logger.error("Invalid or missing token in Authorization header");
+//            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(new WalletResponse("Invalid or missing token", null, 0.0)));
+//        }
+//
+//        // Log token info for debugging
+//        logger.info("WALLET CONTROLLER: Token with length: {}, Token first/last 10 chars: {} / {}",
+//                token.length(),
+//                token.substring(0, Math.min(10, token.length())),
+//                token.substring(Math.max(0, token.length() - 10)));
+//
+//        return mockWalletService.getWalletBalance(userId, token)
+//                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+//                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+//    }
+
+    @GetMapping("/balance-alt")
+    public Mono<ResponseEntity<Map<String, Object>>> getWalletBalance(
+            @RequestParam String userId,
+            @RequestHeader("Authorization") String authHeader) {
+        // Simply delegate to the main getBalance method
+        return getBalance(userId, authHeader);
+    }
+
     @GetMapping("/balance")
-    public Mono<ResponseEntity<WalletResponse>> getBalance(
+    public Mono<ResponseEntity<Map<String, Object>>> getBalance(
             @RequestParam String userId,
             @RequestHeader("Authorization") String authHeader) {
         logger.info("Getting wallet balance for user: {}", userId);
@@ -62,33 +79,37 @@ public class WalletController {
         // Extract the token properly
         String token = extractToken(authHeader);
 
-        return supabaseAuthService.getWalletBalance(userId, token)
-                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+        if (token == null) {
+            logger.error("Invalid or missing token in Authorization header");
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid or missing token");
+            errorResponse.put("userId", userId);
+            errorResponse.put("balance", 0.0);
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse));
+        }
+
+        // Log token info for debugging
+        logger.info("WALLET CONTROLLER: Token with length: {}, Token first/last 10 chars: {} / {}",
+                token.length(),
+                token.substring(0, Math.min(10, token.length())),
+                token.substring(Math.max(0, token.length() - 10)));
+
+        return mockWalletService.getWalletBalance(userId, token)
+                .map(walletResponse -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("userId", walletResponse.getUserId());
+                    response.put("balance", walletResponse.getBalance());
+                    //response.put("success", walletResponse.isSuccess());
+                    if (walletResponse.getMessage() != null) {
+                        response.put("message", walletResponse.getMessage());
+                    }
+                    return ResponseEntity.ok().body(response);
+                })
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
-    /**
-     * Get the balance of the user's wallet (alternative method)
-     * Same functionality but to match test naming
-     */
-    @GetMapping("/balance-alt")
-    public Mono<ResponseEntity<WalletResponse>> getWalletBalance(
-            @RequestParam String userId,
-            @RequestHeader("Authorization") String authHeader) {
-        // Extract the token properly
-        String token = extractToken(authHeader);
-        return getBalance(userId, token);
-    }
-
-    /**
-     * Add funds to the user's wallet
-     * @param userId User ID
-     * @param amount Amount to add
-     * @param authHeader Authorization token
-     * @return Updated wallet
-     */
     @PostMapping("/add-funds")
-    public Mono<ResponseEntity<WalletResponse>> addFunds(
+    public Mono<ResponseEntity<Map<String, Object>>> addFunds(
             @RequestParam String userId,
             @RequestParam Double amount,
             @RequestHeader("Authorization") String authHeader) {
@@ -97,20 +118,31 @@ public class WalletController {
         // Extract the token properly
         String token = extractToken(authHeader);
 
-        return supabaseAuthService.addFunds(userId, amount, token)
-                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+        if (token == null) {
+            logger.error("Invalid or missing token in Authorization header");
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid or missing token");
+            errorResponse.put("userId", userId);
+            errorResponse.put("balance", 0.0);
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse));
+        }
+
+        return mockWalletService.addFunds(userId, amount, token)
+                .map(walletResponse -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("userId", walletResponse.getUserId());
+                    response.put("balance", walletResponse.getBalance());
+                    //response.put("success", walletResponse.isSuccess());
+                    if (walletResponse.getMessage() != null) {
+                        response.put("message", walletResponse.getMessage());
+                    }
+                    return ResponseEntity.ok().body(response);
+                })
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
-    /**
-     * Deduct funds from the user's wallet
-     * @param userId User ID
-     * @param amount Amount to deduct
-     * @param authHeader Authorization token
-     * @return Updated wallet
-     */
     @PostMapping("/deduct-funds")
-    public Mono<ResponseEntity<WalletResponse>> deductFunds(
+    public Mono<ResponseEntity<Map<String, Object>>> deductFunds(
             @RequestParam String userId,
             @RequestParam Double amount,
             @RequestHeader("Authorization") String authHeader) {
@@ -119,19 +151,67 @@ public class WalletController {
         // Extract the token properly
         String token = extractToken(authHeader);
 
-        return supabaseAuthService.deductFunds(userId, amount, token)
-                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+        if (token == null) {
+            logger.error("Invalid or missing token in Authorization header");
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid or missing token");
+            errorResponse.put("userId", userId);
+            errorResponse.put("balance", 0.0);
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse));
+        }
+
+        return mockWalletService.deductFunds(userId, amount, token)
+                .map(walletResponse -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("userId", walletResponse.getUserId());
+                    response.put("balance", walletResponse.getBalance());
+                    //response.put("success", walletResponse.isSuccess());
+                    if (walletResponse.getMessage() != null) {
+                        response.put("message", walletResponse.getMessage());
+                    }
+                    return ResponseEntity.ok().body(response);
+                })
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
-    /**
-     * Get transaction history for a user
-     * @param userId User ID
-     * @param authHeader Authorization token
-     * @return Transaction history
-     */
+    @PostMapping("/create-wallet")
+    public Mono<ResponseEntity<Map<String, Object>>> createWallet(
+            @RequestParam String userId,
+            @RequestParam(required = false) Double initialBalance,
+            @RequestHeader("Authorization") String authHeader) {
+        logger.info("Creating wallet for user: {}", userId);
+
+        // Extract the token properly
+        String token = extractToken(authHeader);
+
+        if (token == null) {
+            logger.error("Invalid or missing token in Authorization header");
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid or missing token");
+            errorResponse.put("userId", userId);
+            errorResponse.put("balance", 0.0);
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse));
+        }
+
+        // Use default initial balance if not provided
+        double balance = initialBalance != null ? initialBalance : 1000.0;
+
+        return mockWalletService.createWalletExplicitly(userId, balance, token)
+                .map(walletResponse -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("userId", walletResponse.getUserId());
+                    response.put("balance", walletResponse.getBalance());
+                    //response.put("success", walletResponse.isSuccess());
+                    if (walletResponse.getMessage() != null) {
+                        response.put("message", walletResponse.getMessage());
+                    }
+                    return ResponseEntity.ok().body(response);
+                })
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+    }
+
     @GetMapping("/transactions")
-    public Mono<ResponseEntity<Map>> getTransactionHistory(
+    public Mono<ResponseEntity<Map<String, Object>>> getTransactionHistory(
             @RequestParam String userId,
             @RequestHeader("Authorization") String authHeader) {
         logger.info("Getting transaction history for user: {}", userId);
@@ -139,9 +219,60 @@ public class WalletController {
         // Extract the token properly
         String token = extractToken(authHeader);
 
-        return supabaseAuthService.getTransactionHistory(userId, token)
+        if (token == null) {
+            logger.error("Invalid or missing token in Authorization header");
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", "Invalid or missing token");
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
+        }
+
+        return mockWalletService.getTransactionHistory(userId, token)
                 .map(transactions -> ResponseEntity.ok().body(transactions))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+    }
+
+//    @PostMapping("/create-wallet")
+//    public Mono<ResponseEntity<WalletResponse>> createWallet(
+//            @RequestParam String userId,
+//            @RequestParam(required = false) Double initialBalance,
+//            @RequestHeader("Authorization") String authHeader) {
+//        logger.info("Creating wallet for user: {}", userId);
+//
+//        // Extract the token properly
+//        String token = extractToken(authHeader);
+//
+//        if (token == null) {
+//            logger.error("Invalid or missing token in Authorization header");
+//            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(new WalletResponse("Invalid or missing token", null, 0.0)));
+//        }
+//
+//        // Use default initial balance if not provided
+//        double balance = initialBalance != null ? initialBalance : 1000.0;
+//
+//        return mockWalletService.createWalletExplicitly(userId, balance, token)
+//                .map(walletResponse -> ResponseEntity.ok().body(walletResponse))
+//                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+//    }
+
+    @GetMapping("/check-wallet")
+    public Mono<ResponseEntity<Map<String, Object>>> checkWalletExists(
+            @RequestParam String userId,
+            @RequestHeader("Authorization") String authHeader) {
+        logger.info("Checking if wallet exists for user: {}", userId);
+
+        // Extract the token properly
+        String token = extractToken(authHeader);
+
+        if (token == null) {
+            logger.error("Invalid or missing token in Authorization header");
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", "Invalid or missing token");
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
+        }
+
+        return mockWalletService.checkWalletExists(userId, token)
+                .map(result -> ResponseEntity.ok().body(result));
     }
 
     @GetMapping("/test-token")
@@ -163,162 +294,19 @@ public class WalletController {
 
         response.put("originalHeader", authHeader);
         response.put("extractedToken", token);
-
-        // Try a simple Supabase call with the token
-        try {
-            logger.info("Testing token with Supabase");
-
-            supabaseClient.get()
-                    .uri("/auth/v1/user")
-                    .headers(headers -> headers.set("Authorization", "Bearer " + token))
-                    .retrieve()
-                    .toBodilessEntity()
-                    .block(); // Use block for simplicity in this test endpoint
-
-            response.put("supabaseTest", "Success");
-            logger.info("Supabase test successful");
-        } catch (Exception e) {
-            logger.error("Error testing with Supabase: {}", e.getMessage(), e);
-            response.put("supabaseTest", "Failed: " + e.getMessage());
-
-            if (e instanceof WebClientResponseException) {
-                WebClientResponseException wcre = (WebClientResponseException) e;
-                response.put("statusCode", wcre.getStatusCode().toString());
-                response.put("responseBody", wcre.getResponseBodyAsString());
-                logger.error("Supabase response: {} - {}", wcre.getStatusCode(), wcre.getResponseBodyAsString());
-            }
-        }
+        response.put("supabaseTest", "Success (mocked)");
 
         return ResponseEntity.ok(response);
     }
 
-
-    @GetMapping("/check-token")
-    public ResponseEntity<Map<String, Object>> checkToken(@RequestHeader("Authorization") String authHeader) {
-        Map<String, Object> response = new HashMap<>();
-
-        String token = extractToken(authHeader);
-        response.put("tokenLength", token.length());
-        response.put("tokenStart", token.substring(0, Math.min(10, token.length())));
-        response.put("tokenEnd", token.substring(Math.max(0, token.length() - 10)));
-
-        // Check if token has the expected JWT structure (header.payload.signature)
-        String[] parts = token.split("\\.");
-        response.put("partsCount", parts.length);
-
-        if (parts.length == 3) {
-            response.put("isValidJwtFormat", true);
-        } else {
-            response.put("isValidJwtFormat", false);
-        }
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/direct-test")
-    public ResponseEntity<Map<String, Object>> directTest(@RequestHeader("Authorization") String authHeader) {
-        System.out.println("================== DIRECT TEST STARTED ==================");
-        System.out.println("AUTH HEADER: " + authHeader);
+    @PostMapping("/init-db")
+    public ResponseEntity<Map<String, Object>> initializeDatabase() {
+        logger.info("Mock initializing wallet database");
 
         Map<String, Object> response = new HashMap<>();
-        String token = extractToken(authHeader);
-
-        System.out.println("EXTRACTED TOKEN: " + token);
-        System.out.println("TOKEN LENGTH: " + token.length());
-
-        response.put("token", token);
-
-        logger.info("Running direct test with token: {}", token.substring(0, Math.min(10, token.length())) + "...");
-
-        // Get the token parts for debugging
-        String[] parts = token.split("\\.");
-        if (parts.length == 3) {
-            logger.info("Token has valid JWT format with 3 parts");
-        } else {
-            logger.warn("Token does NOT have valid JWT format. Parts: {}", parts.length);
-        }
-
-        try {
-            // Create a completely new WebClient instance
-            WebClient newClient = WebClient.builder()
-                    .baseUrl(supabaseUrl)
-                    .build();
-
-            logger.info("Attempting direct call to Supabase with custom headers");
-
-            String result = newClient.get()
-                    .uri("/rest/v1/wallets?limit=1")
-                    .header("apikey", supabaseKey)
-                    .header("Authorization", "Bearer " + token)
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-
-            response.put("status", "success");
-            response.put("result", result);
-            logger.info("Direct call successful!");
-        } catch (Exception e) {
-            logger.error("Direct call failed: {}", e.getMessage(), e);
-            response.put("status", "error");
-            response.put("message", e.getMessage());
-
-            if (e instanceof WebClientResponseException) {
-                WebClientResponseException wcre = (WebClientResponseException) e;
-                response.put("statusCode", wcre.getStatusCode().toString());
-                response.put("responseBody", wcre.getResponseBodyAsString());
-                logger.error("Supabase response: {} - {}", wcre.getStatusCode(), wcre.getResponseBodyAsString());
-            }
-        }
+        response.put("success", true);
+        response.put("message", "Mock wallet database initialized successfully");
 
         return ResponseEntity.ok(response);
     }
-
-    @GetMapping("/test-anon")
-    public ResponseEntity<Map<String, Object>> testAnonAccess() {
-        Map<String, Object> response = new HashMap<>();
-
-        logger.info("Testing anonymous access with Supabase anon key");
-
-        try {
-            WebClient newClient = WebClient.builder()
-                    .baseUrl(supabaseUrl)
-                    .build();
-
-            String result = newClient.get()
-                    .uri("/rest/v1/wallets?limit=1")
-                    .header("apikey", supabaseKey)
-                    .header("Authorization", "Bearer " + supabaseKey) // Use anon key as Bearer token
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-
-            response.put("status", "success");
-            response.put("result", result);
-            logger.info("Anonymous access successful!");
-        } catch (Exception e) {
-            logger.error("Anonymous access failed: {}", e.getMessage(), e);
-            response.put("status", "error");
-            response.put("message", e.getMessage());
-
-            if (e instanceof WebClientResponseException) {
-                WebClientResponseException wcre = (WebClientResponseException) e;
-                response.put("statusCode", wcre.getStatusCode().toString());
-                response.put("responseBody", wcre.getResponseBodyAsString());
-            }
-        }
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/raw-token")
-    public String rawToken(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        if (authHeader == null) {
-            return "No Authorization header provided";
-        }
-
-        String token = extractToken(authHeader);
-        return "Token: " + token;
-    }
-
-
 }
