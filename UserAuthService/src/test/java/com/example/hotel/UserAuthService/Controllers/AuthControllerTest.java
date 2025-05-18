@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,10 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,16 +121,16 @@ class AuthControllerTest {
 
     @Test
     void testResetPassword() {
-        // Arrange
-        String email = "user@example.com";
-        when(supabaseAuthService.resetPassword(anyString()))
-            .thenReturn(Mono.empty());
-
+        // This method doesn't actually use the Supabase service in the current implementation
+        // No need to stub the supabaseAuthService here since it's not used
+        
         // Act
+        String email = "user@example.com";
         ResponseEntity<?> response = authController.resetPassword(email);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Password reset functionality not implemented yet", ((MessageResponse)response.getBody()).getMessage());
     }
 
     @Test

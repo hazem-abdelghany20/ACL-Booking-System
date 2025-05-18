@@ -1,8 +1,9 @@
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\config\TestSecurityConfig.java
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\Controllers\AuthControllerTest.java
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\Controllers\OAuthControllerTest.java
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\Controllers\OAuthTestSecurityConfig.java
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\Controllers\WalletControllerTest.java
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\services\SupabaseAuthServiceIntegrationTest.java
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\SupabaseAuthServiceTest.java
-C:\Users\lenovo\Desktop\GUC\Semester 10\ACL\ACL-Booking-System\UserAuthService\src\test\java\com\example\hotel\UserAuthService\UserAuthServiceApplicationTests.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/Controllers/AuthControllerTest.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/Controllers/OAuthControllerTest.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/Controllers/OAuthTestSecurityConfig.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/Controllers/WalletControllerTest.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/SupabaseAuthServiceTest.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/UserAuthServiceApplicationTests.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/config/TestConfig.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/config/TestSecurityConfig.java
+/Users/hazzouma/Documents/uni/sem 19/ACL-Booking-System/UserAuthService/src/test/java/com/example/hotel/UserAuthService/services/SupabaseAuthServiceIntegrationTest.java

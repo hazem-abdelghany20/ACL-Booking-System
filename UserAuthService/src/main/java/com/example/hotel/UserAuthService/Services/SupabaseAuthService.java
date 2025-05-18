@@ -1,6 +1,8 @@
 package com.example.hotel.UserAuthService.Services;
 
 import com.example.hotel.UserAuthService.payload.request.EmailAuthRequest;
+import com.example.hotel.UserAuthService.payload.request.OtpVerificationRequest;
+import com.example.hotel.UserAuthService.payload.request.PhoneAuthRequest;
 import com.example.hotel.UserAuthService.payload.response.AuthResponse;
 import com.example.hotel.UserAuthService.payload.response.WalletResponse;
 import org.slf4j.Logger;
@@ -75,6 +77,67 @@ public class SupabaseAuthService {
                 .bodyToMono(AuthResponse.class)
                 .doOnSuccess(response -> logger.info("Successfully signed in user with email: {}", request.getEmail()))
                 .doOnError(error -> logger.error("Error signing in user with email: {}", error.getMessage()));
+    }
+    
+    /**
+     * Sign up with phone and password
+     */
+    public Mono<AuthResponse> signUpWithPhone(PhoneAuthRequest request) {
+        logger.info("Signing up user with phone: {}", request.getPhone());
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("phone", request.getPhone());
+        body.put("password", request.getPassword());
+        
+        return supabaseClient.post()
+                .uri("/auth/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(AuthResponse.class)
+                .doOnSuccess(response -> logger.info("Successfully signed up user with phone: {}", request.getPhone()))
+                .doOnError(error -> logger.error("Error signing up user with phone: {}", error.getMessage()));
+    }
+    
+    /**
+     * Sign in with phone and password - requests OTP
+     */
+    public Mono<Void> signInWithPhone(PhoneAuthRequest request) {
+        logger.info("Signing in user with phone: {}", request.getPhone());
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("phone", request.getPhone());
+        body.put("password", request.getPassword());
+        
+        return supabaseClient.post()
+                .uri("/auth/v1/otp")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .doOnSuccess(response -> logger.info("Successfully initiated OTP for phone: {}", request.getPhone()))
+                .doOnError(error -> logger.error("Error initiating OTP: {}", error.getMessage()));
+    }
+    
+    /**
+     * Verify phone OTP
+     */
+    public Mono<AuthResponse> verifyPhoneOtp(OtpVerificationRequest request) {
+        logger.info("Verifying OTP for phone: {}", request.getPhone());
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("phone", request.getPhone());
+        body.put("token", request.getToken());
+        body.put("type", "sms");
+        
+        return supabaseClient.post()
+                .uri("/auth/v1/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(AuthResponse.class)
+                .doOnSuccess(response -> logger.info("Successfully verified OTP for phone: {}", request.getPhone()))
+                .doOnError(error -> logger.error("Error verifying OTP: {}", error.getMessage()));
     }
     
     /**

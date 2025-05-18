@@ -1,3 +1,8 @@
-com\example\hotel\UserAuthService\UserAuthServiceApplicationTests.class
-com\example\hotel\UserAuthService\Controllers\WalletControllerTest.class
-com\example\hotel\UserAuthService\Controllers\OAuthTestSecurityConfig.class
+com/example/hotel/UserAuthService/SupabaseAuthServiceTest.class
+com/example/hotel/UserAuthService/Controllers/AuthControllerTest.class
+com/example/hotel/UserAuthService/UserAuthServiceApplicationTests.class
+com/example/hotel/UserAuthService/Controllers/WalletControllerTest.class
+com/example/hotel/UserAuthService/Controllers/OAuthControllerTest.class
+com/example/hotel/UserAuthService/Controllers/OAuthTestSecurityConfig.class
+com/example/hotel/UserAuthService/services/SupabaseAuthServiceIntegrationTest.class
+com/example/hotel/UserAuthService/config/TestConfig.class
