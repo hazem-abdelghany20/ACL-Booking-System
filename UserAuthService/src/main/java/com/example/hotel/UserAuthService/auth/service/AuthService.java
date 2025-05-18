@@ -161,9 +161,14 @@ public class AuthService {
                 .uri("/auth/v1/recover")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .doOnSuccess(response -> logger.info("Successfully sent password reset email to: {}", email))
-                .doOnError(error -> logger.error("Error sending password reset email: {}", error.getMessage()));
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        return response.toBodilessEntity().then(Mono.<Void>empty());
+                    } else {
+                        return response.createException().flatMap(Mono::error);
+                    }
+                })
+                .doOnSuccess(aVoid -> logger.info("Successfully initiated password reset for email: {}", email))
+                .doOnError(error -> logger.error("Error sending password reset email to {}: {}", email, error.getMessage()));
     }
 } 

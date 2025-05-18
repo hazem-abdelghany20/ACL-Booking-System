@@ -69,8 +69,12 @@ public class SupabaseAuthController {
     @PostMapping("/reset-password")
     public Mono<ResponseEntity<MessageResponse>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(request.getEmail())
-                .map(result -> ResponseEntity.ok(new MessageResponse("Password reset email sent successfully")))
-                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new MessageResponse("Failed to send password reset email")));
+                .then(Mono.just(ResponseEntity.ok(new MessageResponse("Password reset email sent successfully"))))
+                .onErrorResume(error -> {
+                    // This will catch actual errors from authService.resetPassword() (e.g., if Supabase returned a 500)
+                    // You can add logging here if you have a logger instance in the controller
+                    return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                     .body(new MessageResponse("Failed to send password reset email")));
+                });
     }
 } 
