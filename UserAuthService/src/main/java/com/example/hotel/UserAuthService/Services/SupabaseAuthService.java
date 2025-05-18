@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -156,73 +157,81 @@ public class SupabaseAuthService {
      */
     public Mono<WalletResponse> getWalletBalance(String userId, String token) {
         logger.info("Getting wallet balance for user: {}", userId);
-        
+
         return supabaseClient.get()
                 .uri("/rest/v1/wallets?user_id=eq." + userId)
-                .header("Authorization", "Bearer " + token)
+                // Replace the default Authorization header instead of adding a new one
+                .headers(headers -> headers.set("Authorization", "Bearer " + token))
                 .retrieve()
                 .bodyToMono(WalletResponse.class)
                 .doOnSuccess(response -> logger.info("Successfully got wallet balance for user: {}", userId))
-                .doOnError(error -> logger.error("Error getting wallet balance: {}", error.getMessage()));
+                .doOnError(error -> {
+                    logger.error("Error getting wallet balance: {}", error.getMessage());
+                    if (error instanceof WebClientResponseException) {
+                        WebClientResponseException wcre = (WebClientResponseException) error;
+                        logger.error("Response body: {}", wcre.getResponseBodyAsString());
+                    }
+                });
     }
-    
-    /**
-     * Add funds to a user's wallet in Supabase
-     * @param userId The ID of the user to add funds to
-     * @param amount The amount to add
-     * @param token Authentication token for the user
-     * @return WalletResponse containing the updated wallet information
-     */
+
     public Mono<WalletResponse> addFunds(String userId, Double amount, String token) {
         logger.info("Adding {} funds to wallet for user: {}", amount, userId);
-        
+
         return supabaseClient.post()
                 .uri("/rest/v1/rpc/add_funds")
-                .header("Authorization", "Bearer " + token)
+                // Replace the default Authorization header
+                .headers(headers -> headers.set("Authorization", "Bearer " + token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("user_id", userId, "amount", amount))
                 .retrieve()
                 .bodyToMono(WalletResponse.class)
                 .doOnSuccess(response -> logger.info("Successfully added funds to wallet for user: {}", userId))
-                .doOnError(error -> logger.error("Error adding funds to wallet: {}", error.getMessage()));
+                .doOnError(error -> {
+                    logger.error("Error adding funds to wallet: {}", error.getMessage());
+                    if (error instanceof WebClientResponseException) {
+                        WebClientResponseException wcre = (WebClientResponseException) error;
+                        logger.error("Response body: {}", wcre.getResponseBodyAsString());
+                    }
+                });
     }
-    
-    /**
-     * Deduct funds from a user's wallet in Supabase
-     * @param userId The ID of the user to deduct funds from
-     * @param amount The amount to deduct
-     * @param token Authentication token for the user
-     * @return WalletResponse containing the updated wallet information
-     */
+
     public Mono<WalletResponse> deductFunds(String userId, Double amount, String token) {
         logger.info("Deducting {} funds from wallet for user: {}", amount, userId);
-        
+
         return supabaseClient.post()
                 .uri("/rest/v1/rpc/deduct_funds")
-                .header("Authorization", "Bearer " + token)
+                // Replace the default Authorization header
+                .headers(headers -> headers.set("Authorization", "Bearer " + token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("user_id", userId, "amount", amount))
                 .retrieve()
                 .bodyToMono(WalletResponse.class)
                 .doOnSuccess(response -> logger.info("Successfully deducted funds from wallet for user: {}", userId))
-                .doOnError(error -> logger.error("Error deducting funds from wallet: {}", error.getMessage()));
+                .doOnError(error -> {
+                    logger.error("Error deducting funds from wallet: {}", error.getMessage());
+                    if (error instanceof WebClientResponseException) {
+                        WebClientResponseException wcre = (WebClientResponseException) error;
+                        logger.error("Response body: {}", wcre.getResponseBodyAsString());
+                    }
+                });
     }
-    
-    /**
-     * Get transaction history for a user from Supabase
-     * @param userId The ID of the user to get transaction history for
-     * @param token Authentication token for the user
-     * @return Map containing transaction history
-     */
+
     public Mono<Map> getTransactionHistory(String userId, String token) {
         logger.info("Getting transaction history for user: {}", userId);
-        
+
         return supabaseClient.get()
                 .uri("/rest/v1/transactions?user_id=eq." + userId + "&order=created_at.desc")
-                .header("Authorization", "Bearer " + token)
+                // Replace the default Authorization header
+                .headers(headers -> headers.set("Authorization", "Bearer " + token))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .doOnSuccess(response -> logger.info("Successfully got transaction history for user: {}", userId))
-                .doOnError(error -> logger.error("Error getting transaction history: {}", error.getMessage()));
+                .doOnError(error -> {
+                    logger.error("Error getting transaction history: {}", error.getMessage());
+                    if (error instanceof WebClientResponseException) {
+                        WebClientResponseException wcre = (WebClientResponseException) error;
+                        logger.error("Response body: {}", wcre.getResponseBodyAsString());
+                    }
+                });
     }
 } 
