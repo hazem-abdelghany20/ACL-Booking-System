@@ -1,6 +1,6 @@
 package com.example.hotel.UserAuthService.Controllers;
 
-import com.example.hotel.UserAuthService.Services.SupabaseAuthService;
+import com.example.hotel.UserAuthService.Services.MockWalletService;
 import com.example.hotel.UserAuthService.payload.response.WalletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 public class WalletControllerTest {
 
     @Mock
-    private SupabaseAuthService supabaseAuthService;
+    private MockWalletService mockWalletService;  // Changed to MockWalletService
 
     @InjectMocks
     private WalletController walletController;
@@ -41,24 +41,24 @@ public class WalletControllerTest {
     @Test
     public void testGetWalletBalance() {
         // Arrange
-        WalletResponse mockResponse = new WalletResponse();
-        mockResponse.setUserId(userId);
-        mockResponse.setBalance(100.0);
+        WalletResponse mockWalletResponse = new WalletResponse();
+        mockWalletResponse.setUserId(userId);
+        mockWalletResponse.setBalance(100.0);
 
-        when(supabaseAuthService.getWalletBalance(anyString(), anyString()))
-                .thenReturn(Mono.just(mockResponse));
+        when(mockWalletService.getWalletBalance(anyString(), anyString()))
+                .thenReturn(Mono.just(mockWalletResponse));
 
         // Act
-        Mono<ResponseEntity<WalletResponse>> resultMono = walletController.getWalletBalance(userId, token);
+        Mono<ResponseEntity<Map<String, Object>>> resultMono = walletController.getBalance(userId, token);
 
         // Assert
         StepVerifier.create(resultMono)
                 .expectNextMatches(response -> {
-                    WalletResponse body = response.getBody();
+                    Map<String, Object> body = response.getBody();
                     return response.getStatusCode() == HttpStatus.OK &&
                             body != null &&
-                            body.getUserId().equals(userId) &&
-                            body.getBalance() == 100.0;
+                            body.get("userId").equals(userId) &&
+                            (Double) body.get("balance") == 100.0;
                 })
                 .verifyComplete();
     }
@@ -66,24 +66,24 @@ public class WalletControllerTest {
     @Test
     public void testAddFunds() {
         // Arrange
-        WalletResponse mockResponse = new WalletResponse();
-        mockResponse.setUserId(userId);
-        mockResponse.setBalance(150.0); // 100 + 50
+        WalletResponse mockWalletResponse = new WalletResponse();
+        mockWalletResponse.setUserId(userId);
+        mockWalletResponse.setBalance(150.0); // 100 + 50
 
-        when(supabaseAuthService.addFunds(anyString(), anyDouble(), anyString()))
-                .thenReturn(Mono.just(mockResponse));
+        when(mockWalletService.addFunds(anyString(), anyDouble(), anyString()))
+                .thenReturn(Mono.just(mockWalletResponse));
 
         // Act
-        Mono<ResponseEntity<WalletResponse>> resultMono = walletController.addFunds(userId, 50.0, token);
+        Mono<ResponseEntity<Map<String, Object>>> resultMono = walletController.addFunds(userId, 50.0, token);
 
         // Assert
         StepVerifier.create(resultMono)
                 .expectNextMatches(response -> {
-                    WalletResponse body = response.getBody();
+                    Map<String, Object> body = response.getBody();
                     return response.getStatusCode() == HttpStatus.OK &&
                             body != null &&
-                            body.getUserId().equals(userId) &&
-                            body.getBalance() == 150.0;
+                            body.get("userId").equals(userId) &&
+                            (Double) body.get("balance") == 150.0;
                 })
                 .verifyComplete();
     }
@@ -95,20 +95,20 @@ public class WalletControllerTest {
         mockResponse.setUserId(userId);
         mockResponse.setBalance(50.0); // 100 - 50
 
-        when(supabaseAuthService.deductFunds(anyString(), anyDouble(), anyString()))
+        when(mockWalletService.deductFunds(anyString(), anyDouble(), anyString()))
                 .thenReturn(Mono.just(mockResponse));
 
         // Act
-        Mono<ResponseEntity<WalletResponse>> resultMono = walletController.deductFunds(userId, 50.0, token);
+        Mono<ResponseEntity<Map<String, Object>>> resultMono = walletController.deductFunds(userId, 50.0, token);
 
         // Assert
         StepVerifier.create(resultMono)
                 .expectNextMatches(response -> {
-                    WalletResponse body = response.getBody();
+                    Map<String, Object> body = response.getBody();
                     return response.getStatusCode() == HttpStatus.OK &&
                             body != null &&
-                            body.getUserId().equals(userId) &&
-                            body.getBalance() == 50.0;
+                            body.get("userId").equals(userId) &&
+                            (Double) body.get("balance") == 50.0;
                 })
                 .verifyComplete();
     }
@@ -129,11 +129,11 @@ public class WalletControllerTest {
         Map<String, Object> mockResponse = new HashMap<>();
         mockResponse.put("transactions", List.of(mockTransaction1, mockTransaction2));
 
-        when(supabaseAuthService.getTransactionHistory(anyString(), anyString()))
+        when(mockWalletService.getTransactionHistory(anyString(), anyString()))
                 .thenReturn(Mono.just(mockResponse));
 
         // Act
-        Mono<ResponseEntity<Map>> resultMono = walletController.getTransactionHistory(userId, token);
+        Mono<ResponseEntity<Map<String, Object>>> resultMono = walletController.getTransactionHistory(userId, token);
 
         // Assert
         StepVerifier.create(resultMono)
@@ -148,11 +148,11 @@ public class WalletControllerTest {
     @Test
     public void testGetWalletBalance_NotFound() {
         // Arrange
-        when(supabaseAuthService.getWalletBalance(anyString(), anyString()))
+        when(mockWalletService.getWalletBalance(anyString(), anyString()))
                 .thenReturn(Mono.empty());
 
         // Act
-        Mono<ResponseEntity<WalletResponse>> resultMono = walletController.getWalletBalance(userId, token);
+        Mono<ResponseEntity<Map<String, Object>>> resultMono = walletController.getBalance(userId, token);
 
         // Assert
         StepVerifier.create(resultMono)
