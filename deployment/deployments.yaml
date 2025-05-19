@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: booking-service
-          image: hazzouma/booking-service:arm64
+          image: booking-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 3000
           envFrom:
@@ -67,7 +68,8 @@ spec:
     spec:
       containers:
         - name: user-auth-service
-          image: hazzouma/user-auth-service:arm64
+          image: user-auth-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 3002
           envFrom:
@@ -93,7 +95,8 @@ spec:
     spec:
       containers:
         - name: event-service
-          image: hazzouma/event-service:arm64
+          image: event-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 3003
           envFrom:
@@ -119,7 +122,8 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: hazzouma/notification-service:arm64
+          image: notification-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 3004
           envFrom:
@@ -145,7 +149,8 @@ spec:
     spec:
       containers:
         - name: search-service
-          image: hazzouma/search-service:arm64
+          image: search-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 3005
           envFrom:
