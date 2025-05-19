@@ -27,7 +27,7 @@
       <module name="EventService" options="-parameters" />
       <module name="NotificationService" options="-parameters" />
       <module name="SearchService" options="-parameters" />
-      <module name="UserAuthService" options="-parameters --enable-preview" />
+      <module name="UserAuthService" options="-parameters" />
       <module name="apigateway" options="-parameters" />
     </option>
   </component>
