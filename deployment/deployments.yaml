@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: booking-service
-          image: saraeladawy/booking-service
+          image: hazzouma/booking-service:arm64
           ports:
             - containerPort: 3000
           envFrom:
@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: payment-service
-          image: saraeladawy/payment-service
+          image: nginx:alpine
           ports:
             - containerPort: 3001
           envFrom:
@@ -67,7 +67,7 @@ spec:
     spec:
       containers:
         - name: user-auth-service
-          image: saraeladawy/user-auth-service
+          image: hazzouma/user-auth-service:arm64
           ports:
             - containerPort: 3002
           envFrom:
@@ -93,7 +93,7 @@ spec:
     spec:
       containers:
         - name: event-service
-          image: saraeladawy/event-service
+          image: hazzouma/event-service:arm64
           ports:
             - containerPort: 3003
           envFrom:
@@ -119,7 +119,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: saraeladawy/notification-service
+          image: hazzouma/notification-service:arm64
           ports:
             - containerPort: 3004
           envFrom:
@@ -145,7 +145,7 @@ spec:
     spec:
       containers:
         - name: search-service
-          image: saraeladawy/search-service
+          image: hazzouma/search-service:arm64
           ports:
             - containerPort: 3005
           envFrom:
