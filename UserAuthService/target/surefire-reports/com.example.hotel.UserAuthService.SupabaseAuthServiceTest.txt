@@ -1,0 +1,108 @@
+-------------------------------------------------------------------------------
+Test set: com.example.hotel.UserAuthService.SupabaseAuthServiceTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 7, Skipped: 0, Time elapsed: 1.059 s <<< FAILURE! -- in com.example.hotel.UserAuthService.SupabaseAuthServiceTest
+com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testVerifyPhoneOtp -- Time elapsed: 0.921 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:55)
+  2. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:59)
+  3. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:64)
+  4. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:65)
+  5. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:197)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testGetWalletBalance -- Time elapsed: 0.023 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "org.springframework.web.reactive.function.client.WebClient$RequestHeadersUriSpec.uri(String, Object[])" because the return value of "org.springframework.web.reactive.function.client.WebClient.get()" is null
+	at com.example.hotel.UserAuthService.Services.SupabaseAuthService.getWalletBalance(SupabaseAuthService.java:228)
+	at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testGetWalletBalance(SupabaseAuthServiceTest.java:203)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testSignUpWithEmail -- Time elapsed: 0.030 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:55)
+  2. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:59)
+  3. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:64)
+  4. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:65)
+  5. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:197)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testSignUpWithPhone -- Time elapsed: 0.027 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:55)
+  2. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:59)
+  3. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:64)
+  4. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:65)
+  5. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:197)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testSignInWithEmail -- Time elapsed: 0.007 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:55)
+  2. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:59)
+  3. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:64)
+  4. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:65)
+  5. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:197)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testSignInWithPhone -- Time elapsed: 0.021 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:55)
+  2. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:59)
+  3. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:64)
+  4. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:65)
+  5. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:197)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.example.hotel.UserAuthService.SupabaseAuthServiceTest.testResetPassword -- Time elapsed: 0.010 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:55)
+  2. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:59)
+  3. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:64)
+  4. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:65)
+  5. -> at com.example.hotel.UserAuthService.SupabaseAuthServiceTest.setup(SupabaseAuthServiceTest.java:68)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:197)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
