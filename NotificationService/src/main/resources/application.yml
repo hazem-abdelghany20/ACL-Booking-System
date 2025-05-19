@@ -9,3 +9,16 @@ spring:
     port: 5672
     username: guest
     password: guest
+  # Redis Configuration
+  # Session Management with Redis
+  session:
+    store-type: redis
+    redis:
+      namespace: hotel:session
+      flush-mode: on-save
+    timeout: 3600  # Session timeout in seconds (1 hour)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000
