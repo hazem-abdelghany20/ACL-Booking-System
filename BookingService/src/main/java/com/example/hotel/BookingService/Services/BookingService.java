@@ -7,7 +7,6 @@ import com.example.hotel.BookingService.Clients.AvailabilityClient;
 import com.example.hotel.BookingService.Clients.UserClient;
 import com.example.hotel.BookingService.rabbitmq.BookingProducer;
 import com.example.hotel.BookingService.Repositories.BookingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +20,16 @@ import java.util.UUID;
 @Service
 public class BookingService {
 
-
     private final AvailabilityClient availabilityClient;
     private final EventClient eventClient;
     private final BookingProducer producer;
     private final BookingRepository bookingRepository;
     private final UserClient userClient;
 
-
-
     @Value("${Name}") private String name;
     @Value("${ID}")   private String id;
+    // Default auth token to use with wallet API
+    private static final String DEFAULT_AUTH_TOKEN = "Bearer default-token";
 
     public BookingService(AvailabilityClient availabilityClient,
                           EventClient        eventClient,
@@ -45,7 +43,7 @@ public class BookingService {
         this.producer           = producer;
     }
 
-     // Create a new booking: check availability, persist, decrement tickets, notify.
+    // Create a new booking: check availability, persist, decrement tickets, notify.
     public String createEventBooking(Long eventId, Long userId) {
         // Check ticket availability
         @SuppressWarnings("unchecked")
@@ -69,9 +67,7 @@ public class BookingService {
         return bookingId;
     }
 
-
-     // Cancel an existing booking: only CONFIRMED → CANCELLED, free a ticket, notify.
-
+    // Cancel an existing booking: only CONFIRMED → CANCELLED, free a ticket, notify.
     public void cancelBooking(String bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -91,8 +87,7 @@ public class BookingService {
         producer.sendBooking(bookingId + " CANCELLED");
     }
 
-     //Refund a booking: only CANCELLED → REFUNDED, no ticket adjustment, notify.
-
+    //Refund a booking: only CANCELLED → REFUNDED, no ticket adjustment, notify.
     public void refundBooking(String bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -109,11 +104,9 @@ public class BookingService {
         producer.sendBooking(bookingId + " REFUNDED");
     }
 
-
     @Transactional
     public String processEventPayment(Long userId, Long eventId) {
         try {
-
             ResponseEntity<Map<String, Object>> eventResponse = eventClient.getEvent(eventId);
 
             if (eventResponse.getStatusCode() != HttpStatus.OK) {
@@ -125,12 +118,8 @@ public class BookingService {
                 throw new RuntimeException("Event data is null for event ID: " + eventId);
             }
 
-
             try {
-
                 ResponseEntity<?> participantCheckResponse = eventClient.isUserRegisteredForEvent(eventId, userId);
-
-
                 Map<String, Object> checkResponseBody = (Map<String, Object>) participantCheckResponse.getBody();
                 boolean isAlreadyRegistered = false;
 
@@ -142,54 +131,55 @@ public class BookingService {
                     return "You are already registered for this event: " + eventData.get("title");
                 }
             } catch (Exception e) {
-
                 System.err.println("Warning: Could not verify registration status: " + e.getMessage());
             }
 
-
             Double price = (Double) eventData.get("price");
-
 
             if (price < 0) {
                 throw new IllegalStateException("Invalid event price: " + price);
             }
 
-
             if (price == 0) {
                 try {
-
                     eventClient.addParticipantToEvent(eventId, userId);
-
                     userClient.addEventToUser(userId, eventId);
-
                     return "Successfully registered for free event: " + eventData.get("title");
                 } catch (Exception e) {
                     throw new RuntimeException("Error registering for free event: " + e.getMessage());
                 }
             }
 
+            // Convert Long userId to String for wallet API
+            String userIdStr = String.valueOf(userId);
 
-            ResponseEntity<Map<String, Object>> response = userClient.processPayment(userId, price);
+            // Process the payment using the updated wallet API
+            ResponseEntity<Map<String, Object>> response = userClient.deductFunds(
+                    userIdStr,
+                    price,
+                    DEFAULT_AUTH_TOKEN
+            );
 
             Map<String, Object> responseBody = response.getBody();
-            if (responseBody == null || !(Boolean)responseBody.get("success")) {
+            boolean paymentSuccess = (responseBody != null && response.getStatusCode() == HttpStatus.OK);
+
+            if (!paymentSuccess) {
                 return "Payment failed: Insufficient funds";
             }
 
-
             try {
-
                 eventClient.addParticipantToEvent(eventId, userId);
-
                 userClient.addEventToUser(userId, eventId);
 
+                System.out.println("Payment processed successfully");
 
-                System.out.println("Payment response: " + responseBody);
+                // Get updated balance
+                ResponseEntity<Map<String, Object>> balanceResponse = userClient.getWalletBalance(
+                        userIdStr,
+                        DEFAULT_AUTH_TOKEN
+                );
 
-
-                ResponseEntity<Map<String, Object>> balanceResponse = userClient.getBalance(userId);
                 Double remainingBalance = 0.0;
-
                 if (balanceResponse.getStatusCode() == HttpStatus.OK) {
                     Map<String, Object> balanceBody = balanceResponse.getBody();
                     if (balanceBody != null && balanceBody.containsKey("balance")) {
@@ -200,12 +190,9 @@ public class BookingService {
                 return "Payment processed successfully for event: " + eventData.get("title") +
                         ". You are now registered for this event. Your new balance is: " + remainingBalance;
             } catch (Exception e) {
-
-
                 return "Payment processed but there was an issue registering for the event: " + e.getMessage() +
                         ". Please contact support.";
             }
-
         } catch (Exception e) {
             throw new IllegalStateException("Error processing payment: " + e.getMessage());
         }
@@ -213,7 +200,6 @@ public class BookingService {
 
     public String processEventRefund(Long userId, Long eventId) {
         try {
-
             ResponseEntity<Map<String, Object>> eventResponse = eventClient.getEvent(eventId);
 
             if (eventResponse.getStatusCode() != HttpStatus.OK) {
@@ -225,12 +211,8 @@ public class BookingService {
                 throw new RuntimeException("Event data is null for event ID: " + eventId);
             }
 
-
             try {
-
                 ResponseEntity<?> participantCheckResponse = eventClient.isUserRegisteredForEvent(eventId, userId);
-
-
                 Map<String, Object> checkResponseBody = (Map<String, Object>) participantCheckResponse.getBody();
                 boolean isRegistered = false;
 
@@ -242,52 +224,53 @@ public class BookingService {
                     return "Refund failed: You are not registered for this event.";
                 }
             } catch (Exception e) {
-
                 return "Unable to verify registration status: " + e.getMessage();
             }
 
-
             Double price = (Double) eventData.get("price");
-
 
             if (price == 0) {
                 try {
-
                     eventClient.removeParticipantFromEvent(eventId, userId);
-
-
                     userClient.removeEventFromUser(userId, eventId);
-
                     return "Successfully unregistered from free event: " + eventData.get("title");
                 } catch (Exception e) {
                     throw new RuntimeException("Error unregistering from free event: " + e.getMessage());
                 }
             }
 
-
             if (price < 0) {
                 return "No refund because refund amount is negative";
             }
 
+            // Convert Long userId to String for wallet API
+            String userIdStr = String.valueOf(userId);
 
-            ResponseEntity<Map<String, Object>> response = userClient.processPayment(userId, -price);
+            // Process the refund using the updated wallet API
+            ResponseEntity<Map<String, Object>> response = userClient.addFunds(
+                    userIdStr,
+                    price,
+                    DEFAULT_AUTH_TOKEN
+            );
 
             Map<String, Object> responseBody = response.getBody();
-            if (responseBody == null || !(Boolean)responseBody.get("success")) {
+            boolean refundSuccess = (responseBody != null && response.getStatusCode() == HttpStatus.OK);
+
+            if (!refundSuccess) {
                 return "Refund failed";
             }
 
             try {
-
                 eventClient.removeParticipantFromEvent(eventId, userId);
-
-
                 userClient.removeEventFromUser(userId, eventId);
 
+                // Get updated balance
+                ResponseEntity<Map<String, Object>> balanceResponse = userClient.getWalletBalance(
+                        userIdStr,
+                        DEFAULT_AUTH_TOKEN
+                );
 
-                ResponseEntity<Map<String, Object>> balanceResponse = userClient.getBalance(userId);
                 Double newBalance = 0.0;
-
                 if (balanceResponse.getStatusCode() == HttpStatus.OK) {
                     Map<String, Object> balanceBody = balanceResponse.getBody();
                     if (balanceBody != null && balanceBody.containsKey("balance")) {
@@ -295,22 +278,15 @@ public class BookingService {
                     }
                 }
 
-
                 return "Refund of " + price + " " + eventData.get("currency") +
                         " processed successfully for event: " + eventData.get("title") +
                         ". You are now unregistered from this event. Your new balance is: " + newBalance;
             } catch (Exception e) {
-
-
                 return "Refund processed but there was an issue unregistering from the event: " + e.getMessage() +
                         ". Please contact support.";
             }
-
         } catch (Exception e) {
             throw new IllegalStateException("Error processing refund: " + e.getMessage());
         }
     }
-
-
 }
-

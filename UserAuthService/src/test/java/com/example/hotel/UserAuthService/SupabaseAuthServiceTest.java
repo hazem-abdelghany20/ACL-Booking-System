@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,22 +48,25 @@ public class SupabaseAuthServiceTest {
 
     @BeforeEach
     public void setup() {
-        // Enable lenient mode for all stubs
-        Mockito.lenient().when(supabaseClient.post()).thenReturn(requestBodyUriSpec);
-        Mockito.lenient().when(supabaseClient.get()).thenReturn(requestHeadersUriSpec);
-        
-        Mockito.lenient().when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
-        Mockito.lenient().when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersUriSpec);
-        
-        Mockito.lenient().when(requestBodyUriSpec.contentType(any(MediaType.class))).thenReturn(requestBodyUriSpec);
-        Mockito.lenient().when(requestBodyUriSpec.bodyValue(any())).thenReturn(requestHeadersSpec);
-        
-        Mockito.lenient().when(requestHeadersUriSpec.header(anyString(), anyString())).thenReturn(requestHeadersUriSpec);
-        Mockito.lenient().when(requestHeadersSpec.header(anyString(), anyString())).thenReturn(requestHeadersSpec);
-        
-        Mockito.lenient().when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        Mockito.lenient().when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
-        
+        // Setup for POST requests
+        when(supabaseClient.post()).thenReturn(requestBodyUriSpec);
+
+        // Setup for GET requests
+        when(supabaseClient.get()).thenReturn(requestHeadersUriSpec);
+
+        // Common configuration for both request types
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersUriSpec);
+
+        when(requestBodyUriSpec.contentType(any(MediaType.class))).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+
+        when(requestHeadersUriSpec.header(anyString(), anyString())).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersSpec.header(anyString(), anyString())).thenReturn(requestHeadersSpec);
+
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+
         // Create the service with the mocked WebClient
         supabaseAuthService = new SupabaseAuthService(supabaseClient, supabaseAdminClient);
     }
