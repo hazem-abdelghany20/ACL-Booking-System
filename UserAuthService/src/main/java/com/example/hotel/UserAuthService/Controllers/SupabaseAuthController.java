@@ -34,6 +34,8 @@ public class SupabaseAuthController {
     
     @PostMapping("/signin")
     public Mono<ResponseEntity<AuthResponse>> signIn(@Valid @RequestBody EmailAuthRequest request) {
+
+       System.out.println(request);
         return authService.signInWithEmail(request)
                 .map(response -> ResponseEntity.ok(response))
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
